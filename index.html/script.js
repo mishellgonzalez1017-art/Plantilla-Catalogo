@@ -1,6 +1,11 @@
 const musicToggle = document.querySelector('#musicToggle');
 const backgroundMusic = document.querySelector('#backgroundMusic');
-const interactionEvents = ['pointerdown', 'keydown'];
+const exploreButton = document.querySelector('#exploreButton');
+const catalogSection = document.querySelector('#catalogo');
+let hasExploredCatalog = false;
+let isCatalogVisible = false;
+let isPageVisible = document.visibilityState === 'visible';
+let userMutedMusic = false;
 
 function updateMusicButton(isPlaying) {
   musicToggle.classList.toggle('is-playing', isPlaying);
@@ -20,20 +25,13 @@ async function playBackgroundMusic() {
   }
 }
 
-function removeInteractionListeners() {
-  interactionEvents.forEach(eventName => document.removeEventListener(eventName, enableMusicAfterInteraction));
-}
-
-function enableMusicAfterInteraction() {
-  removeInteractionListeners();
-  if (backgroundMusic.paused) playBackgroundMusic();
-}
-
 musicToggle.addEventListener('click', async () => {
-  removeInteractionListeners();
+  if (!hasExploredCatalog) return;
   if (backgroundMusic.paused) {
-    await playBackgroundMusic();
+    userMutedMusic = false;
+    if (isCatalogVisible && isPageVisible) await playBackgroundMusic();
   } else {
+    userMutedMusic = true;
     backgroundMusic.pause();
     updateMusicButton(false);
   }
@@ -42,5 +40,28 @@ musicToggle.addEventListener('click', async () => {
 backgroundMusic.addEventListener('play', () => updateMusicButton(true));
 backgroundMusic.addEventListener('pause', () => updateMusicButton(false));
 
-interactionEvents.forEach(eventName => document.addEventListener(eventName, enableMusicAfterInteraction, { once: true }));
-playBackgroundMusic();
+exploreButton.addEventListener('click', async () => {
+  hasExploredCatalog = true;
+  userMutedMusic = false;
+  await playBackgroundMusic();
+});
+
+const catalogObserver = new IntersectionObserver(([entry]) => {
+  isCatalogVisible = entry.isIntersecting;
+  if (!isCatalogVisible || !isPageVisible || userMutedMusic) {
+    backgroundMusic.pause();
+    return;
+  }
+  if (hasExploredCatalog) playBackgroundMusic();
+}, { threshold: 0.2 });
+
+catalogObserver.observe(catalogSection);
+
+document.addEventListener('visibilitychange', () => {
+  isPageVisible = document.visibilityState === 'visible';
+  if (!isPageVisible) {
+    backgroundMusic.pause();
+    return;
+  }
+  if (hasExploredCatalog && isCatalogVisible && !userMutedMusic) playBackgroundMusic();
+});
