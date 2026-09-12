@@ -27,7 +27,7 @@ musicToggle.addEventListener('click', async () => {
   if (!hasExploredCatalog) return;
   if (backgroundMusic.paused) {
     userMutedMusic = false;
-    if (isPageVisible && window.scrollY > 0) await playBackgroundMusic();
+    if (isPageVisible) await playBackgroundMusic();
   } else {
     userMutedMusic = true;
     backgroundMusic.pause();
@@ -50,12 +50,6 @@ exploreButton.addEventListener('touchstart', () => {
   userMutedMusic = false;
   updateMusicButton(true);
   backgroundMusic.play().catch(() => updateMusicButton(false));
-}, { passive: true });
-
-window.addEventListener('scroll', () => {
-  if (hasExploredCatalog && window.scrollY <= 0 && !backgroundMusic.paused) {
-    backgroundMusic.pause();
-  }
 }, { passive: true });
 
 document.addEventListener('visibilitychange', () => {
