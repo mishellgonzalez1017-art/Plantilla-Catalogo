@@ -38,6 +38,84 @@
     .product-image { max-height: 250px; }
     .product-image { transition: transform .5s ease; }
     .product-card:hover .product-image { transform: scale(1.045); }
+    #intro {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      overflow: hidden;
+      touch-action: none;
+      overscroll-behavior: contain;
+      transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.85s ease;
+    }
+    #intro.is-hidden {
+      opacity: 0;
+      transform: scale(1.05);
+      visibility: hidden;
+      pointer-events: none;
+    }
+    #scene { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .intro-glow { width: min(55vw, 600px); aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, rgba(232,166,156,.3), rgba(176,139,85,.15) 45%, transparent 70%); filter: blur(16px); }
+    #productGrid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      perspective: 1000px;
+    }
+    @media (min-width: 640px) {
+      #productGrid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+    }
+    @media (min-width: 768px) {
+      #productGrid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 22px;
+      }
+    }
+    @media (min-width: 1024px) {
+      #productGrid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 24px;
+      }
+    }
+    .product-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 100%;
+      min-width: 0;
+      border-radius: 16px;
+      background: #fbf8f4;
+      box-shadow: 0 10px 22px rgba(40, 37, 34, 0.08), 0 3px 6px rgba(0,0,0,0.04);
+      transform-style: preserve-3d;
+      transition: transform 0.35s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.35s ease, border-color 0.35s ease;
+      border: 1px solid #ede4db;
+    }
+    .product-card:hover {
+      transform: translateY(-8px) rotateX(4deg) scale(1.02);
+      box-shadow: 0 20px 32px rgba(72, 49, 38, .16), 0 6px 12px rgba(0,0,0,.08);
+      border-color: #d1b8ad;
+    }
+    .product-image-container {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+      border-radius: 12px;
+      background: #ede3d8;
+    }
+    .product-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover !important;
+      object-position: center center !important;
+      display: block;
+      transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+    .product-card:hover .product-image {
+      transform: scale(1.08);
+    }
     .drawer { transform: translateX(100%); transition: transform .42s cubic-bezier(.22,1,.36,1); }
     .drawer.is-open { transform: translateX(0); }
     .overlay { opacity: 0; visibility: hidden; transition: opacity .35s ease, visibility .35s ease; }
@@ -46,6 +124,7 @@
     .toast.show { transform: translate(-50%, 0); opacity: 1; }
     .filter-button.active { background: #282522; color: #fff; border-color: #282522; }
     .no-scroll { overflow: hidden; }
+    body.no-scroll { overflow: hidden !important; touch-action: none; overscroll-behavior: none; }
     @media (max-width: 640px) { .intro-glow { width: 110vw; } }
   </style>
 </head>
@@ -53,9 +132,16 @@
   <section id="intro" class="fixed inset-0 z-[60] overflow-hidden bg-[#211b1a] text-[#f8f3ed]">
     <canvas id="scene" aria-hidden="true"></canvas>
     <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(114,60,72,.24),transparent_42%)]"></div>
+  <section id="intro" class="fixed inset-0 z-[60] overflow-hidden bg-[#161212] text-[#f8f3ed] select-none">
+    <canvas id="scene" aria-hidden="true" class="absolute inset-0 h-full w-full pointer-events-none"></canvas>
+    <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(114,60,72,.35),transparent_60%)]"></div>
+    <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#161212]/60 via-transparent to-[#161212]/80"></div>
     <div class="relative z-10 flex min-h-screen flex-col items-center justify-between px-6 py-10 text-center">
       <div class="flex w-full items-center justify-between text-[10px] uppercase tracking-[.34em] text-[#d6b9a9]">
         <span>GT / 2024</span><span>Hecho para emprender</span>
+      <div class="flex w-full items-center justify-between text-[10px] uppercase tracking-[.38em] text-[#d6b9a9]">
+        <span class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-[#b08b55] animate-ping"></span> GT / 2026</span>
+        <span>Colección de Alta Gama</span>
       </div>
       <div class="flex flex-col items-center">
         <div class="intro-glow absolute top-[19%] -z-10"></div>
@@ -63,10 +149,23 @@
         <h1 class="display text-7xl font-semibold leading-[.78] tracking-[-.04em] sm:text-9xl">Catálogo<br><em class="font-normal text-[#e8a69c]">Guatemala</em></h1>
         <p class="mt-8 max-w-xs text-sm leading-6 text-[#cdbeb6]">Una vitrina digital para compartir tus productos y hacer crecer tu emprendimiento.</p>
         <button id="exploreButton" type="button" class="touch-manipulation mt-9 inline-flex items-center gap-3 border border-[#f8f3ed] px-7 py-3.5 text-[11px] font-semibold uppercase tracking-[.2em] transition hover:bg-[#f8f3ed] hover:text-[#282522]">
+        <div class="mb-5 inline-flex items-center gap-2 rounded-full border border-[#e8a69c]/30 bg-white/5 px-4 py-1.5 text-[10px] uppercase tracking-[.3em] text-[#e8a69c] backdrop-blur-md">
+          <i data-lucide="sparkles" class="h-3 w-3 text-[#b08b55]"></i> Vitrina Digital Interactiva 3D
+        </div>
+        <h1 class="display text-7xl font-semibold leading-[.8] tracking-[-.04em] sm:text-9xl">Catálogo<br><em class="font-normal text-[#e8a69c]">Guatemala</em></h1>
+        <p class="mt-8 max-w-sm text-sm leading-6 text-[#cdbeb6] sm:text-base">
+          El nuevo estándar visual interactivo para impulsar las ventas de marcas y negocios en Guatemala.
+        </p>
+        <button id="exploreButton" type="button" class="touch-manipulation mt-9 inline-flex items-center gap-3 rounded-full border border-[#f8f3ed]/70 bg-[#f8f3ed]/10 px-8 py-4 text-xs font-bold uppercase tracking-[.22em] text-[#f8f3ed] backdrop-blur-md shadow-2xl transition hover:border-[#e8a69c] hover:bg-[#f8f3ed] hover:text-[#282522] hover:scale-105">
           Entrar al catálogo <i data-lucide="arrow-down-right" class="h-4 w-4"></i>
         </button>
       </div>
       <div class="flex w-full items-center justify-between text-[10px] uppercase tracking-[.25em] text-[#9f8b84]"><span>Scroll to discover</span><span>Est. 2024</span></div>
+      <div class="flex w-full items-center justify-between text-[10px] uppercase tracking-[.25em] text-[#9f8b84]">
+        <span>GT • Edición 2026</span>
+        <span class="hidden sm:inline-block tracking-[.3em] text-[#cdbeb6]">Toca el botón para ingresar</span>
+        <span>Experiencia 3D</span>
+      </div>
     </div>
   </section>
 
@@ -544,6 +643,7 @@
 
   <footer class="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-8 text-[10px] uppercase tracking-[.2em] text-[#8e8179] sm:flex-row sm:items-center sm:justify-between sm:px-8">
     <span>Catálogo Guatemala © 2024</span>
+    <span>Catálogo Guatemala © 2026</span>
     <span class="flex items-center gap-2 font-semibold text-[#3a8c67]">
       <i data-lucide="message-circle" class="h-3.5 w-3.5"></i> WhatsApp: +502 4028-3552
     </span>

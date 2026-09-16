@@ -225,3 +225,54 @@
   }
 }
 
+/* ========================================================
+   ENCUADRE PROFESIONAL Y UNIFORMIDAD DE FOTOS DE PRODUCTO
+   ======================================================== */
+.product-image-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 14px;
+  background-color: #f1e9e2;
+}
+
+.product-image {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  display: block;
+  transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.product-card:hover .product-image {
+  transform: scale(1.08);
+}
+
+/* ========================================================
+   PANTALLA DE BIENVENIDA DE LUJO (INTRO 3D)
+   ======================================================== */
+#intro {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  overflow: hidden;
+  touch-action: none;
+  overscroll-behavior: contain;
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.9s ease;
+}
+
+#intro.is-hidden {
+  opacity: 0;
+  transform: scale(1.06);
+  visibility: hidden;
+  pointer-events: none;
+}
+
+body.no-scroll {
+  overflow: hidden !important;
+  touch-action: none;
+  overscroll-behavior: none;
+}
+
