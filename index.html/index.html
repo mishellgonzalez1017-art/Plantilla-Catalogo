@@ -129,43 +129,26 @@
   </style>
 </head>
 <body class="grain">
-  <section id="intro" class="fixed inset-0 z-[60] overflow-hidden bg-[#211b1a] text-[#f8f3ed]">
+  <section id="intro" class="intro fixed inset-0 z-[60] overflow-hidden text-[#f8f3ed] select-none" aria-label="Pantalla de bienvenida">
     <canvas id="scene" aria-hidden="true"></canvas>
-    <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(114,60,72,.24),transparent_42%)]"></div>
-  <section id="intro" class="fixed inset-0 z-[60] overflow-hidden bg-[#161212] text-[#f8f3ed] select-none">
-    <canvas id="scene" aria-hidden="true" class="absolute inset-0 h-full w-full pointer-events-none"></canvas>
-    <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(114,60,72,.35),transparent_60%)]"></div>
-    <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#161212]/60 via-transparent to-[#161212]/80"></div>
-    <div class="relative z-10 flex min-h-screen flex-col items-center justify-between px-6 py-10 text-center">
-      <div class="flex w-full items-center justify-between text-[10px] uppercase tracking-[.34em] text-[#d6b9a9]">
-        <span>GT / 2024</span><span>Hecho para emprender</span>
+    <div class="intro__wash" aria-hidden="true"></div>
+    <div class="intro__content relative z-10 flex min-h-screen flex-col items-center justify-between px-6 py-9 text-center sm:px-10 sm:py-12">
       <div class="flex w-full items-center justify-between text-[10px] uppercase tracking-[.38em] text-[#d6b9a9]">
-        <span class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-[#b08b55] animate-ping"></span> GT / 2026</span>
+        <span class="flex items-center gap-2"><span class="intro__status-dot"></span> GT / 2026</span>
         <span>Colección de Alta Gama</span>
       </div>
       <div class="flex flex-col items-center">
-        <div class="intro-glow absolute top-[19%] -z-10"></div>
-        <p class="mb-4 text-[10px] uppercase tracking-[.42em] text-[#d6b9a9]">Tu negocio merece mostrarse</p>
-        <h1 class="display text-7xl font-semibold leading-[.78] tracking-[-.04em] sm:text-9xl">Catálogo<br><em class="font-normal text-[#e8a69c]">Guatemala</em></h1>
-        <p class="mt-8 max-w-xs text-sm leading-6 text-[#cdbeb6]">Una vitrina digital para compartir tus productos y hacer crecer tu emprendimiento.</p>
-        <button id="exploreButton" type="button" class="touch-manipulation mt-9 inline-flex items-center gap-3 border border-[#f8f3ed] px-7 py-3.5 text-[11px] font-semibold uppercase tracking-[.2em] transition hover:bg-[#f8f3ed] hover:text-[#282522]">
+        <div class="intro-glow absolute top-[18%] -z-10"></div>
         <div class="mb-5 inline-flex items-center gap-2 rounded-full border border-[#e8a69c]/30 bg-white/5 px-4 py-1.5 text-[10px] uppercase tracking-[.3em] text-[#e8a69c] backdrop-blur-md">
           <i data-lucide="sparkles" class="h-3 w-3 text-[#b08b55]"></i> Vitrina Digital Interactiva 3D
         </div>
         <h1 class="display text-7xl font-semibold leading-[.8] tracking-[-.04em] sm:text-9xl">Catálogo<br><em class="font-normal text-[#e8a69c]">Guatemala</em></h1>
-        <p class="mt-8 max-w-sm text-sm leading-6 text-[#cdbeb6] sm:text-base">
-          El nuevo estándar visual interactivo para impulsar las ventas de marcas y negocios en Guatemala.
-        </p>
-        <button id="exploreButton" type="button" class="touch-manipulation mt-9 inline-flex items-center gap-3 rounded-full border border-[#f8f3ed]/70 bg-[#f8f3ed]/10 px-8 py-4 text-xs font-bold uppercase tracking-[.22em] text-[#f8f3ed] backdrop-blur-md shadow-2xl transition hover:border-[#e8a69c] hover:bg-[#f8f3ed] hover:text-[#282522] hover:scale-105">
+        <p class="mt-8 max-w-sm text-sm leading-6 text-[#cdbeb6] sm:text-base">El nuevo estándar visual interactivo para impulsar las ventas de marcas y negocios en Guatemala.</p>
+        <button id="exploreButton" type="button" class="intro__button touch-manipulation mt-9 inline-flex items-center gap-3 rounded-full border border-[#f8f3ed]/70 bg-[#f8f3ed]/10 px-8 py-4 text-xs font-bold uppercase tracking-[.22em] text-[#f8f3ed] backdrop-blur-md shadow-2xl">
           Entrar al catálogo <i data-lucide="arrow-down-right" class="h-4 w-4"></i>
         </button>
       </div>
-      <div class="flex w-full items-center justify-between text-[10px] uppercase tracking-[.25em] text-[#9f8b84]"><span>Scroll to discover</span><span>Est. 2024</span></div>
-      <div class="flex w-full items-center justify-between text-[10px] uppercase tracking-[.25em] text-[#9f8b84]">
-        <span>GT • Edición 2026</span>
-        <span class="hidden sm:inline-block tracking-[.3em] text-[#cdbeb6]">Toca el botón para ingresar</span>
-        <span>Experiencia 3D</span>
-      </div>
+      <div class="flex w-full items-center justify-between text-[10px] uppercase tracking-[.25em] text-[#9f8b84]"><span>Toca para descubrir</span><span>Experiencia 3D</span></div>
     </div>
   </section>
 
@@ -642,7 +625,6 @@
   </main>
 
   <footer class="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-8 text-[10px] uppercase tracking-[.2em] text-[#8e8179] sm:flex-row sm:items-center sm:justify-between sm:px-8">
-    <span>Catálogo Guatemala © 2024</span>
     <span>Catálogo Guatemala © 2026</span>
     <span class="flex items-center gap-2 font-semibold text-[#3a8c67]">
       <i data-lucide="message-circle" class="h-3.5 w-3.5"></i> WhatsApp: +502 4028-3552

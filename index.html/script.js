@@ -41,7 +41,6 @@ function renderProducts() {
   ));
   document.querySelector('#productGrid').innerHTML = visible.map(product => {
     const productWaText = encodeURIComponent(`¡Hola! Me interesa la plantilla del catálogo y quiero información sobre el producto: ${product.name} (Código: ${product.id})`);
-    return `<article class="product-card group overflow-hidden p-3"><div class="relative mb-4 aspect-[.86] overflow-hidden rounded-xl bg-[#e9ded4]"><img class="product-image h-full w-full object-cover" src="${product.image}" alt="${product.name}" loading="lazy"><span class="absolute left-3 top-3 bg-[#fbf8f4]/90 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[.14em] text-wine">${product.brand}</span><button class="add-button absolute bottom-3 right-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#fbf8f4] text-ink shadow-md transition hover:bg-wine hover:text-white" data-id="${product.id}" aria-label="Añadir ${product.name} al carrito"><i data-lucide="plus" class="h-5 w-5"></i></button></div><div class="flex items-start justify-between gap-3"><div><h3 class="display text-xl font-semibold leading-none sm:text-2xl">${product.name}</h3><p class="mt-2 text-xs leading-5 text-[#81756d]">${product.description}</p></div><span class="shrink-0 text-sm font-semibold">Q${product.price}</span></div><a class="product-whatsapp mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#3a8c67] px-3 py-2 text-center text-[10px] font-bold uppercase tracking-[.08em] text-white transition hover:bg-[#2f7455]" href="https://wa.me/${WHATSAPP_PHONE}?text=${productWaText}" target="_blank" rel="noopener">Consultar plantilla <i data-lucide="message-circle" class="h-4 w-4"></i></a><p class="mt-3 text-[9px] font-semibold uppercase tracking-[.18em] text-[#aa9c93]">Código ${product.id}</p></article>`;
     return `<article class="product-card group overflow-hidden p-3.5"><div class="product-image-container mb-4"><img class="product-image" src="${product.image}" alt="${product.name}" loading="lazy"><span class="absolute left-3 top-3 rounded-md bg-[#fbf8f4]/95 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[.14em] text-wine shadow-sm">${product.brand}</span><button class="add-button absolute bottom-3 right-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#fbf8f4] text-ink shadow-md transition hover:bg-wine hover:text-white" data-id="${product.id}" aria-label="Añadir ${product.name} al carrito"><i data-lucide="plus" class="h-5 w-5"></i></button></div><div class="flex items-start justify-between gap-3"><div><h3 class="display text-xl font-semibold leading-none sm:text-2xl">${product.name}</h3><p class="mt-2 text-xs leading-5 text-[#81756d]">${product.description}</p></div><span class="shrink-0 text-sm font-semibold text-wine">Q${product.price}</span></div><a class="product-whatsapp mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#3a8c67] px-3 py-2.5 text-center text-[10px] font-bold uppercase tracking-[.08em] text-white transition hover:bg-[#2f7455]" href="https://wa.me/${WHATSAPP_PHONE}?text=${productWaText}" target="_blank" rel="noopener">Consultar plantilla <i data-lucide="message-circle" class="h-4 w-4"></i></a><p class="mt-3 text-[9px] font-semibold uppercase tracking-[.18em] text-[#aa9c93]">Código ${product.id}</p></article>`;
   }).join('');
   document.querySelector('#emptyState').classList.toggle('hidden', visible.length > 0);
@@ -93,71 +92,34 @@ function setupScene() {
   if (!window.THREE) return;
   const canvas = document.querySelector('#scene');
   if (!canvas) return;
-
-  // Evitar que gestos de scroll/touch muevan o cierren la pantalla
   if (intro) {
-    intro.addEventListener('wheel', e => e.stopPropagation(), { passive: false });
-    intro.addEventListener('touchmove', e => e.stopPropagation(), { passive: false });
+    intro.addEventListener('wheel', event => event.stopPropagation(), { passive: false });
+    intro.addEventListener('touchmove', event => event.stopPropagation(), { passive: false });
   }
 
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, .1, 100);
-  camera.position.z = 5;
   const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
   camera.position.z = 5.2;
-
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-  renderer.setSize(innerWidth, innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.15;
   renderer.setClearColor(0x000000, 0);
-  const group = new THREE.Group();
-  scene.add(group);
-  const sphere = new THREE.Mesh(
-    new THREE.IcosahedronGeometry(1.35, 4),
-    new THREE.MeshPhysicalMaterial({ color: 0xb26e6d, roughness: .18, metalness: .35, clearcoat: 1, clearcoatRoughness: .15, transparent: true, opacity: .88 })
-  );
-  group.add(sphere);
-  const ring = new THREE.Mesh(
-    new THREE.TorusGeometry(1.7, .012, 12, 120),
-    new THREE.MeshBasicMaterial({ color: 0xe8c1a7, transparent: true, opacity: .5 })
-  );
-  ring.rotation.x = 1.1;
-  group.add(ring);
-  const particles = new THREE.BufferGeometry();
-  const positions = [];
-  for (let i = 0; i < 380; i += 1) {
-    const radius = 2.2 + Math.random() * 2.4;
-
-  // Iluminación de estudio de lujo
-  const ambientLight = new THREE.AmbientLight(0xfffaea, 1.4);
-  scene.add(ambientLight);
-
-  const mainLight = new THREE.DirectionalLight(0xfff1de, 2.6);
-  mainLight.position.set(6, 8, 7);
-  scene.add(mainLight);
-
-  const fillLight = new THREE.DirectionalLight(0xe8a69c, 1.4);
-  fillLight.position.set(-6, -4, -4);
-  scene.add(fillLight);
-
-  const goldPointLight = new THREE.PointLight(0xd4af37, 3.8, 25);
-  goldPointLight.position.set(4, 3, 3);
-  scene.add(goldPointLight);
-
-  const winePointLight = new THREE.PointLight(0x9e3d52, 4.2, 25);
-  winePointLight.position.set(-4, -2, 2);
-  scene.add(winePointLight);
+  scene.add(new THREE.AmbientLight(0xfff4df, 1.1));
+  const keyLight = new THREE.DirectionalLight(0xffead4, 2.8);
+  keyLight.position.set(5, 7, 6);
+  scene.add(keyLight);
+  const roseLight = new THREE.PointLight(0xb94f6e, 4, 20);
+  roseLight.position.set(-4, -2, 3);
+  scene.add(roseLight);
+  const goldLight = new THREE.PointLight(0xd4af37, 4, 18);
+  goldLight.position.set(4, 2, 4);
+  scene.add(goldLight);
 
   const rootGroup = new THREE.Group();
   scene.add(rootGroup);
-
-  // Gema poliédrica central con material físico de refracción y brillo
-  const jewelGeometry = new THREE.IcosahedronGeometry(1.3, 2);
-  const jewelMaterial = new THREE.MeshPhysicalMaterial({
+  const jewelMesh = new THREE.Mesh(new THREE.IcosahedronGeometry(1.28, 2), new THREE.MeshPhysicalMaterial({
     color: 0x823b49,
     emissive: 0x220c12,
     roughness: 0.14,
@@ -169,63 +131,26 @@ function setupScene() {
     reflectivity: 0.9,
     transparent: true,
     opacity: 0.92
-  });
-  const jewelMesh = new THREE.Mesh(jewelGeometry, jewelMaterial);
+  }));
   rootGroup.add(jewelMesh);
-
-  // Halo geométrico exterior tipo joyería
-  const haloGeometry = new THREE.IcosahedronGeometry(1.48, 1);
-  const haloMaterial = new THREE.MeshBasicMaterial({
-    color: 0xe8a69c,
-    wireframe: true,
-    transparent: true,
-    opacity: 0.28
-  });
-  const haloMesh = new THREE.Mesh(haloGeometry, haloMaterial);
+  const haloMesh = new THREE.Mesh(new THREE.IcosahedronGeometry(1.48, 1), new THREE.MeshBasicMaterial({ color: 0xe8a69c, wireframe: true, transparent: true, opacity: 0.28 }));
   rootGroup.add(haloMesh);
-
-  // Anillo orbital 1: Oro pulido
-  const ring1Geometry = new THREE.TorusGeometry(1.9, 0.016, 16, 140);
-  const ring1Material = new THREE.MeshStandardMaterial({
-    color: 0xdeb887,
-    metalness: 0.9,
-    roughness: 0.18
-  });
-  const ring1 = new THREE.Mesh(ring1Geometry, ring1Material);
+  const ring1 = new THREE.Mesh(new THREE.TorusGeometry(1.9, 0.016, 16, 140), new THREE.MeshStandardMaterial({ color: 0xdeb887, metalness: 0.9, roughness: 0.18 }));
   ring1.rotation.x = 1.15;
   ring1.rotation.y = 0.35;
   rootGroup.add(ring1);
-
-  // Anillo orbital 2: Oro rosa / Cobre
-  const ring2Geometry = new THREE.TorusGeometry(2.25, 0.012, 16, 160);
-  const ring2Material = new THREE.MeshStandardMaterial({
-    color: 0xe8a69c,
-    metalness: 0.85,
-    roughness: 0.22
-  });
-  const ring2 = new THREE.Mesh(ring2Geometry, ring2Material);
+  const ring2 = new THREE.Mesh(new THREE.TorusGeometry(2.25, 0.012, 16, 160), new THREE.MeshStandardMaterial({ color: 0xe8a69c, metalness: 0.85, roughness: 0.22 }));
   ring2.rotation.x = -0.75;
   ring2.rotation.z = 0.6;
   rootGroup.add(ring2);
-
-  // Polvo estelar / Partículas flotantes de lujo
-  const particleCount = 650;
   const particleGeometry = new THREE.BufferGeometry();
   const particlePositions = [];
   const particleColors = [];
-
-  const colorPalette = [
-    new THREE.Color(0xd4af37), // Oro
-    new THREE.Color(0xe8a69c), // Oro rosa
-    new THREE.Color(0xfffaea), // Champagne
-    new THREE.Color(0xb08b55)  // Bronce
-  ];
-
-  for (let i = 0; i < particleCount; i++) {
+  const colorPalette = [new THREE.Color(0xd4af37), new THREE.Color(0xe8a69c), new THREE.Color(0xfffaea), new THREE.Color(0xb08b55)];
+  for (let i = 0; i < 650; i += 1) {
     const radius = 2.0 + Math.random() * 3.4;
     const theta = Math.random() * Math.PI * 2;
     const phi = Math.acos(2 * Math.random() - 1);
-    positions.push(radius * Math.sin(phi) * Math.cos(theta), radius * Math.sin(phi) * Math.sin(theta), radius * Math.cos(phi));
     particlePositions.push(
       radius * Math.sin(phi) * Math.cos(theta),
       radius * Math.sin(phi) * Math.sin(theta),
@@ -234,27 +159,10 @@ function setupScene() {
     const chosenColor = colorPalette[Math.floor(Math.random() * colorPalette.length)];
     particleColors.push(chosenColor.r, chosenColor.g, chosenColor.b);
   }
-  particles.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-  group.add(new THREE.Points(particles, new THREE.PointsMaterial({ color: 0xe7b9a4, size: .018, transparent: true, opacity: .8 })));
-  const pointer = { x: 0, y: 0 };
-  addEventListener('pointermove', event => {
-    pointer.x = (event.clientX / innerWidth - .5) * 2;
-    pointer.y = (event.clientY / innerHeight - .5) * 2;
-
   particleGeometry.setAttribute('position', new THREE.Float32BufferAttribute(particlePositions, 3));
   particleGeometry.setAttribute('color', new THREE.Float32BufferAttribute(particleColors, 3));
-
-  const particleMaterial = new THREE.PointsMaterial({
-    size: 0.024,
-    vertexColors: true,
-    transparent: true,
-    opacity: 0.82,
-    blending: THREE.AdditiveBlending
-  });
-  const particles = new THREE.Points(particleGeometry, particleMaterial);
+  const particles = new THREE.Points(particleGeometry, new THREE.PointsMaterial({ size: 0.024, vertexColors: true, transparent: true, opacity: 0.82, blending: THREE.AdditiveBlending }));
   rootGroup.add(particles);
-
-  // Movimiento interactivo suave con inercia lerp
   const pointer = { currentX: 0, currentY: 0, targetX: 0, targetY: 0 };
   window.addEventListener('pointermove', event => {
     pointer.targetX = (event.clientX / window.innerWidth - 0.5) * 2;
@@ -270,37 +178,19 @@ function setupScene() {
     });
   }
 
-  let clock = new THREE.Clock();
-
   function animate() {
     requestAnimationFrame(animate);
-    group.rotation.y += .0025;
-    group.rotation.x += .0008;
-    group.rotation.y += (pointer.x * .06 - group.rotation.y) * .003;
-    group.position.x += (pointer.x * .15 - group.position.x) * .02;
-    group.position.y += (-pointer.y * .15 - group.position.y) * .02;
-    const delta = clock.getDelta();
-
-    // Lerp damping para suavidad cinematográfica
     pointer.currentX += (pointer.targetX - pointer.currentX) * 0.04;
     pointer.currentY += (pointer.targetY - pointer.currentY) * 0.04;
-
-    // Rotaciones orbitales independientes
     jewelMesh.rotation.y += 0.005;
     jewelMesh.rotation.x += 0.0025;
-
     haloMesh.rotation.y -= 0.003;
     haloMesh.rotation.z += 0.002;
-
     ring1.rotation.z += 0.004;
     ring1.rotation.x += 0.002;
-
     ring2.rotation.y += 0.0035;
     ring2.rotation.z -= 0.002;
-
     particles.rotation.y += 0.001;
-
-    // Inclinación reactiva al cursor
     rootGroup.rotation.y = pointer.currentX * 0.28;
     rootGroup.rotation.x = -pointer.currentY * 0.22;
     rootGroup.position.x = pointer.currentX * 0.35;
@@ -310,13 +200,9 @@ function setupScene() {
   }
 
   animate();
-  addEventListener('resize', () => {
-    camera.aspect = innerWidth / innerHeight;
-
   window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
-    renderer.setSize(innerWidth, innerHeight);
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
 }
