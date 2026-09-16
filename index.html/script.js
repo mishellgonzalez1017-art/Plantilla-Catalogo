@@ -9,8 +9,9 @@ let isPageVisible = document.visibilityState === 'visible';
 let userMutedMusic = false;
 let selectedBrand = 'Todas';
 let cart = JSON.parse(localStorage.getItem('atelier-belle-cart') || '{}');
-const whatsappMessage = '¡Hola! Vi la plantilla del catálogo y me interesa adaptar una similar para mi negocio en Guatemala.';
-const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(whatsappMessage)}`;
+const WHATSAPP_PHONE = '50240283552';
+const whatsappMessage = '¡Hola! Me interesa obtener información sobre las plantillas para catálogos web para mi negocio.';
+const whatsappUrl = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(whatsappMessage)}`;
 const money = value => `$${value.toFixed(2)}`;
 const productById = id => products.find(product => product.id === id);
 
@@ -38,7 +39,10 @@ function renderProducts() {
     (selectedBrand === 'Todas' || product.brand === selectedBrand)
     && (!term || `${product.name} ${product.brand} ${product.id}`.toLowerCase().includes(term))
   ));
-  document.querySelector('#productGrid').innerHTML = visible.map(product => `<article class="product-card group overflow-hidden p-3"><div class="relative mb-4 aspect-[.86] overflow-hidden rounded-xl bg-[#e9ded4]"><img class="product-image h-full w-full object-cover" src="${product.image}" alt="${product.name}" loading="lazy"><span class="absolute left-3 top-3 bg-[#fbf8f4]/90 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[.14em] text-wine">${product.brand}</span><button class="add-button absolute bottom-3 right-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#fbf8f4] text-ink shadow-md transition hover:bg-wine hover:text-white" data-id="${product.id}" aria-label="Añadir ${product.name} al carrito"><i data-lucide="plus" class="h-5 w-5"></i></button></div><div class="flex items-start justify-between gap-3"><div><h3 class="display text-xl font-semibold leading-none sm:text-2xl">${product.name}</h3><p class="mt-2 text-xs leading-5 text-[#81756d]">${product.description}</p></div><span class="shrink-0 text-sm font-semibold">Q${product.price}</span></div><a class="product-whatsapp mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#3a8c67] px-3 py-2 text-center text-[10px] font-bold uppercase tracking-[.08em] text-white transition hover:bg-[#2f7455]" href="${whatsappUrl}" target="_blank" rel="noopener">Consultar plantilla <i data-lucide="message-circle" class="h-4 w-4"></i></a><p class="mt-3 text-[9px] font-semibold uppercase tracking-[.18em] text-[#aa9c93]">Código ${product.id}</p></article>`).join('');
+  document.querySelector('#productGrid').innerHTML = visible.map(product => {
+    const productWaText = encodeURIComponent(`¡Hola! Me interesa la plantilla del catálogo y quiero información sobre el producto: ${product.name} (Código: ${product.id})`);
+    return `<article class="product-card group overflow-hidden p-3"><div class="relative mb-4 aspect-[.86] overflow-hidden rounded-xl bg-[#e9ded4]"><img class="product-image h-full w-full object-cover" src="${product.image}" alt="${product.name}" loading="lazy"><span class="absolute left-3 top-3 bg-[#fbf8f4]/90 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[.14em] text-wine">${product.brand}</span><button class="add-button absolute bottom-3 right-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#fbf8f4] text-ink shadow-md transition hover:bg-wine hover:text-white" data-id="${product.id}" aria-label="Añadir ${product.name} al carrito"><i data-lucide="plus" class="h-5 w-5"></i></button></div><div class="flex items-start justify-between gap-3"><div><h3 class="display text-xl font-semibold leading-none sm:text-2xl">${product.name}</h3><p class="mt-2 text-xs leading-5 text-[#81756d]">${product.description}</p></div><span class="shrink-0 text-sm font-semibold">Q${product.price}</span></div><a class="product-whatsapp mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#3a8c67] px-3 py-2 text-center text-[10px] font-bold uppercase tracking-[.08em] text-white transition hover:bg-[#2f7455]" href="https://wa.me/${WHATSAPP_PHONE}?text=${productWaText}" target="_blank" rel="noopener">Consultar plantilla <i data-lucide="message-circle" class="h-4 w-4"></i></a><p class="mt-3 text-[9px] font-semibold uppercase tracking-[.18em] text-[#aa9c93]">Código ${product.id}</p></article>`;
+  }).join('');
   document.querySelector('#emptyState').classList.toggle('hidden', visible.length > 0);
   lucide.createIcons();
   document.querySelectorAll('.add-button').forEach(button => button.addEventListener('click', () => addToCart(button.dataset.id)));
@@ -56,7 +60,7 @@ function renderCart() {
   document.querySelector('#cartTotal').textContent = money(total);
   document.querySelector('#cartItems').innerHTML = entries.length ? entries.map(({ product, quantity }) => `<div class="flex gap-4 border-b border-[#e6ddd6] py-5"><img src="${product.image}" alt="" class="h-20 w-16 object-cover"><div class="min-w-0 flex-1"><div class="flex justify-between gap-3"><div><p class="text-[9px] font-bold uppercase tracking-[.14em] text-wine">${product.brand}</p><h3 class="display mt-1 truncate text-xl font-semibold">${product.name}</h3><p class="mt-1 text-[10px] uppercase tracking-[.12em] text-[#a0948b]">${product.id}</p></div><strong class="text-sm">${money(product.price * quantity)}</strong></div><div class="mt-3 flex items-center justify-between"><div class="flex items-center border border-[#d8cbc2]"><button class="quantity-button flex h-7 w-7 items-center justify-center" data-id="${product.id}" data-change="-1" aria-label="Reducir cantidad"><i data-lucide="minus" class="h-3 w-3"></i></button><span class="w-7 text-center text-xs">${quantity}</span><button class="quantity-button flex h-7 w-7 items-center justify-center" data-id="${product.id}" data-change="1" aria-label="Aumentar cantidad"><i data-lucide="plus" class="h-3 w-3"></i></button></div><button class="remove-button text-[10px] uppercase tracking-[.12em] text-[#9a8e86] underline underline-offset-4" data-id="${product.id}">Eliminar</button></div></div></div>`).join('') : '<div class="flex h-full flex-col items-center justify-center text-center"><i data-lucide="shopping-bag" class="mb-4 h-8 w-8 text-[#b9aaa1]"></i><p class="display text-3xl">Tu selección está vacía</p><p class="mt-2 max-w-xs text-sm leading-6 text-[#8e8179]">Añade un producto para consultar la plantilla.</p></div>';
   const message = entries.length ? `${whatsappMessage}%0A%0A${entries.map(({ product, quantity }) => `• ${product.id} | ${product.name} x${quantity}`).join('%0A')}` : encodeURIComponent(whatsappMessage);
-  document.querySelector('#whatsappButton').href = `https://wa.me/?text=${message}`;
+  document.querySelector('#whatsappButton').href = `https://wa.me/${WHATSAPP_PHONE}?text=${message}`;
   lucide.createIcons();
   document.querySelectorAll('.quantity-button').forEach(button => button.addEventListener('click', () => changeQuantity(button.dataset.id, Number(button.dataset.change))));
   document.querySelectorAll('.remove-button').forEach(button => button.addEventListener('click', () => changeQuantity(button.dataset.id, -cart[button.dataset.id])));
@@ -176,3 +180,37 @@ setupScene();
 renderProducts();
 renderCart();
 lucide.createIcons();
+
+function init3DEffects() {
+  const heroStage = document.querySelector('.hero-3d-stage');
+  const heroScene = document.querySelector('.hero-3d-scene');
+
+  if (heroStage && heroScene && window.matchMedia('(pointer: fine)').matches) {
+    heroStage.addEventListener('mousemove', (e) => {
+      const rect = heroStage.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      heroScene.style.transform = `rotateY(${x * 18}deg) rotateX(${-y * 18}deg)`;
+    });
+    heroStage.addEventListener('mouseleave', () => {
+      heroScene.style.transform = '';
+    });
+  }
+
+  const categoryCards = document.querySelectorAll('.category-card-3d');
+  categoryCards.forEach(card => {
+    const inner = card.querySelector('.category-card-inner');
+    if (!inner || !window.matchMedia('(pointer: fine)').matches) return;
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      inner.style.transform = `translateY(-10px) rotateY(${x * 14}deg) rotateX(${-y * 14}deg) scale(1.02)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      inner.style.transform = '';
+    });
+  });
+}
+
+init3DEffects();
