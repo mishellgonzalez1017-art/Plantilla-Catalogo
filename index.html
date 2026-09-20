@@ -1,0 +1,696 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Plantilla de catálogo web interactivo para pequeños negocios guatemaltecos.">
+  <title>Catálogo Guatemala | Plantilla para tu negocio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { ink: '#282522', blush: '#e8a69c', shell: '#f8f3ed', wine: '#723c48', gold: '#b08b55' },
+          fontFamily: { display: ['Cormorant Garamond', 'serif'], sans: ['DM Sans', 'sans-serif'] }
+        }
+      }
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root { color-scheme: light; }
+    html { scroll-behavior: smooth; }
+    body { background: #f8f3ed; color: #282522; font-family: 'DM Sans', sans-serif; }
+    .display { font-family: 'Cormorant Garamond', serif; }
+    .grain { position: relative; }
+    .grain::after { content: ''; position: fixed; inset: 0; opacity: .045; pointer-events: none; z-index: 50; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E"); }
+    #intro { transition: opacity .8s ease, visibility .8s ease; }
+    #intro.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    #scene { position: absolute; inset: 0; }
+    .intro-glow { width: min(52vw, 560px); aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, rgba(232,166,156,.25), rgba(232,166,156,0) 68%); filter: blur(8px); }
+    #productGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 10px; perspective: 1000px; }
+    .product-card { width: 100%; min-width: 0; border-radius: 16px; background: #fbf8f4; box-shadow: 0 12px 20px rgba(0,0,0,0.15), 0 4px 8px rgba(0,0,0,0.1); transform-style: preserve-3d; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    .product-card:hover { transform: translateY(-8px) rotateX(4deg) rotateY(-2deg) scale(1.02); box-shadow: 0 18px 30px rgba(72, 49, 38, .18), 0 6px 12px rgba(0,0,0,.12); }
+    .product-image { max-height: 250px; }
+    .product-image { transition: transform .5s ease; }
+    .product-card:hover .product-image { transform: scale(1.045); }
+    #intro {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      overflow: hidden;
+      touch-action: none;
+      overscroll-behavior: contain;
+      transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.85s ease;
+    }
+    #intro.is-hidden {
+      opacity: 0;
+      transform: scale(1.05);
+      visibility: hidden;
+      pointer-events: none;
+    }
+    #scene { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .intro-glow { width: min(55vw, 600px); aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, rgba(232,166,156,.3), rgba(176,139,85,.15) 45%, transparent 70%); filter: blur(16px); }
+    #productGrid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      perspective: 1000px;
+    }
+    @media (min-width: 640px) {
+      #productGrid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+    }
+    @media (min-width: 768px) {
+      #productGrid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 22px;
+      }
+    }
+    @media (min-width: 1024px) {
+      #productGrid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 24px;
+      }
+    }
+    .product-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 100%;
+      min-width: 0;
+      border-radius: 16px;
+      background: #fbf8f4;
+      box-shadow: 0 10px 22px rgba(40, 37, 34, 0.08), 0 3px 6px rgba(0,0,0,0.04);
+      transform-style: preserve-3d;
+      transition: transform 0.35s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.35s ease, border-color 0.35s ease;
+      border: 1px solid #ede4db;
+    }
+    .product-card:hover {
+      transform: translateY(-8px) rotateX(4deg) scale(1.02);
+      box-shadow: 0 20px 32px rgba(72, 49, 38, .16), 0 6px 12px rgba(0,0,0,.08);
+      border-color: #d1b8ad;
+    }
+    .product-image-container {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+      border-radius: 12px;
+      background: #ede3d8;
+    }
+    .product-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover !important;
+      object-position: center center !important;
+      display: block;
+      transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+    .product-card:hover .product-image {
+      transform: scale(1.08);
+    }
+    .drawer { transform: translateX(100%); transition: transform .42s cubic-bezier(.22,1,.36,1); }
+    .drawer.is-open { transform: translateX(0); }
+    .overlay { opacity: 0; visibility: hidden; transition: opacity .35s ease, visibility .35s ease; }
+    .overlay.is-open { opacity: 1; visibility: visible; }
+    .toast { transform: translate(-50%, 24px); opacity: 0; pointer-events: none; transition: opacity .25s ease, transform .25s ease; }
+    .toast.show { transform: translate(-50%, 0); opacity: 1; }
+    .filter-button.active { background: #282522; color: #fff; border-color: #282522; }
+    .no-scroll { overflow: hidden; }
+    body.no-scroll { overflow: hidden !important; touch-action: none; overscroll-behavior: none; }
+    @media (max-width: 640px) { .intro-glow { width: 110vw; } }
+  </style>
+</head>
+<body class="grain">
+  <section id="intro" class="intro fixed inset-0 z-[60] overflow-hidden text-[#f8f3ed] select-none" aria-label="Pantalla de bienvenida">
+    <canvas id="scene" aria-hidden="true"></canvas>
+    <div class="intro__wash" aria-hidden="true"></div>
+    <div class="intro__content relative z-10 flex min-h-screen flex-col items-center justify-between px-6 py-9 text-center sm:px-10 sm:py-12">
+      <div class="flex w-full items-center justify-between text-[10px] uppercase tracking-[.38em] text-[#d6b9a9]">
+        <span class="flex items-center gap-2"><span class="intro__status-dot"></span> GT / 2026</span>
+        <span>Colección de Alta Gama</span>
+      </div>
+      <div class="flex flex-col items-center">
+        <div class="intro-glow absolute top-[18%] -z-10"></div>
+        <div class="mb-5 inline-flex items-center gap-2 rounded-full border border-[#e8a69c]/30 bg-white/5 px-4 py-1.5 text-[10px] uppercase tracking-[.3em] text-[#e8a69c] backdrop-blur-md">
+          <i data-lucide="sparkles" class="h-3 w-3 text-[#b08b55]"></i> Vitrina Digital Interactiva 3D
+        </div>
+        <h1 class="display text-7xl font-semibold leading-[.8] tracking-[-.04em] sm:text-9xl">Catálogo<br><em class="font-normal text-[#e8a69c]">Guatemala</em></h1>
+        <p class="mt-8 max-w-sm text-sm leading-6 text-[#cdbeb6] sm:text-base">El nuevo estándar visual interactivo para impulsar las ventas de marcas y negocios en Guatemala.</p>
+        <button id="exploreButton" type="button" class="intro__button touch-manipulation mt-9 inline-flex items-center gap-3 rounded-full border border-[#f8f3ed]/70 bg-[#f8f3ed]/10 px-8 py-4 text-xs font-bold uppercase tracking-[.22em] text-[#f8f3ed] backdrop-blur-md shadow-2xl">
+          Entrar al catálogo <i data-lucide="arrow-down-right" class="h-4 w-4"></i>
+        </button>
+      </div>
+      <div class="flex w-full items-center justify-between text-[10px] uppercase tracking-[.25em] text-[#9f8b84]"><span>Toca para descubrir</span><span>Experiencia 3D</span></div>
+    </div>
+  </section>
+
+  <div class="bg-[#723c48] px-5 py-2.5 text-center text-xs font-semibold tracking-wide text-white sm:text-sm">
+    🚀 ¡Haz crecer tu negocio en Guatemala con plantillas de catálogos web interactivos y pedidos directos a WhatsApp!
+  </div>
+
+  <header class="sticky top-0 z-40 border-b border-[#ded3ca] bg-[#f8f3ed]/95 backdrop-blur-md">
+    <div class="mx-auto flex h-[72px] max-w-7xl items-center justify-between px-5 sm:px-8">
+      <a href="#inicio" class="display text-3xl font-semibold leading-none">Catálogo <span class="font-normal text-wine">Guatemala</span></a>
+      <nav class="hidden items-center gap-8 text-[11px] uppercase tracking-[.18em] text-[#6b615b] md:flex">
+        <a href="#inicio" class="transition hover:text-wine">Inicio</a>
+        <a href="#categorias" class="transition hover:text-wine">Categorías</a>
+        <a href="#beneficios" class="transition hover:text-wine">Beneficios</a>
+        <a href="#catalogo" class="transition hover:text-wine">Demo en Vivo</a>
+      </nav>
+      <div class="flex items-center gap-3">
+        <div class="social-row hidden md:flex mr-1">
+          <a data-social="facebook" href="#" target="_blank" rel="noopener" class="icon-btn" aria-label="Síguenos en Facebook">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M14 8.5h-1.5A2 2 0 0 0 10.5 10.5V13H9v3h1.5v5H14v-5h2l.5-3h-2.5v-2c0-.28.22-.5.5-.5H14z"/></svg>
+          </a>
+          <a data-social="instagram" href="#" target="_blank" rel="noopener" class="icon-btn" aria-label="Síguenos en Instagram">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17" cy="7" r="0.6" fill="currentColor" stroke="none"/></svg>
+          </a>
+          <a data-social="tiktok" href="#" target="_blank" rel="noopener" class="icon-btn" aria-label="Síguenos en TikTok">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4v9.6a3.4 3.4 0 1 1-2.6-3.3"/><path d="M14 4c.5 2.2 2.1 3.7 4.3 4"/></svg>
+          </a>
+        </div>
+        <a data-wa-link="header" href="#" target="_blank" rel="noopener" class="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-[#3a8c67] px-4 py-2 text-[10px] font-bold uppercase tracking-[.14em] text-white transition hover:bg-[#2f7455]">
+          <i data-lucide="message-circle" class="h-3.5 w-3.5"></i> WhatsApp
+        </a>
+        <button id="musicToggle" class="music-toggle" type="button" aria-label="Reproducir música de fondo" aria-pressed="false"><span class="music-toggle__icon" aria-hidden="true">🔇</span></button>
+        <button id="cartButton" class="relative flex h-11 w-11 items-center justify-center rounded-full border border-[#d8cbc2] transition hover:border-wine hover:text-wine" aria-label="Abrir carrito">
+          <i data-lucide="shopping-bag" class="h-[18px] w-[18px]"></i><span id="cartCount" class="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-wine px-1 text-[10px] font-bold text-white">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO SECTION 3D -->
+    <section id="inicio" class="relative overflow-hidden border-b border-[#ded3ca] pb-16 pt-12 sm:pb-24 sm:pt-20">
+      <div class="pointer-events-none absolute -right-20 -top-20 h-96 w-96 rounded-full bg-[#e8a69c]/20 blur-3xl"></div>
+      <div class="pointer-events-none absolute -bottom-20 -left-20 h-96 w-96 rounded-full bg-[#b08b55]/15 blur-3xl"></div>
+      
+      <div class="mx-auto grid max-w-7xl items-center gap-12 px-5 sm:px-8 lg:grid-cols-12">
+        <!-- Hero Copy -->
+        <div class="lg:col-span-7">
+          <div class="inline-flex items-center gap-2 rounded-full border border-[#d8cbc2] bg-[#fbf8f4] px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[.18em] text-wine">
+            <span class="inline-block h-2 w-2 rounded-full bg-[#3a8c67] animate-pulse"></span>
+            Plantillas Web 3D para Negocios
+          </div>
+          
+          <h1 class="display mt-6 text-5xl font-semibold leading-[.92] tracking-[-.03em] sm:text-7xl lg:text-8xl">
+            Vende más con tu<br>
+            <em class="font-normal text-wine">Catálogo Web</em><br>
+            <span class="text-[#b08b55]">3D & Interactivo.</span>
+          </h1>
+          
+          <p class="mt-6 max-w-xl text-base leading-7 text-[#6e635c] sm:text-lg">
+            Convierte a tus visitantes en clientes fieles con una experiencia visual moderna, fluida y con efectos tridimensionales. Tus clientes seleccionan sus productos favoritos, llenan su carrito y te envían el pedido listo a WhatsApp en un solo clic.
+          </p>
+
+          <div class="mt-8 flex flex-wrap items-center gap-3.5">
+            <a data-wa-link="hero" href="#" target="_blank" rel="noopener" class="btn-3d-primary inline-flex items-center gap-2 rounded-full bg-[#3a8c67] px-6 py-3.5 text-xs font-bold uppercase tracking-[.14em] text-white">
+              <i data-lucide="message-circle" class="h-4 w-4"></i> Pedir Plantilla por WhatsApp
+            </a>
+            <a href="#categorias" class="btn-3d-wine inline-flex items-center gap-2 rounded-full bg-wine px-6 py-3.5 text-xs font-bold uppercase tracking-[.14em] text-white">
+              Ver Categorías <i data-lucide="arrow-down" class="h-4 w-4"></i>
+            </a>
+            <a href="#catalogo" class="btn-3d-secondary inline-flex items-center gap-2 rounded-full border border-[#d8cbc2] bg-[#fbf8f4] px-5 py-3.5 text-xs font-bold uppercase tracking-[.14em] text-ink">
+              Probar Demo <i data-lucide="sparkles" class="h-4 w-4 text-gold"></i>
+            </a>
+          </div>
+
+          <div class="mt-10 grid grid-cols-3 gap-4 border-t border-[#ded3ca] pt-6 text-left">
+            <div>
+              <strong class="display text-2xl font-bold sm:text-3xl text-wine">+100%</strong>
+              <p class="text-[11px] text-[#7c716b] uppercase tracking-wider mt-0.5">Atractivo visual</p>
+            </div>
+            <div>
+              <strong class="display text-2xl font-bold sm:text-3xl text-wine">0%</strong>
+              <p class="text-[11px] text-[#7c716b] uppercase tracking-wider mt-0.5">Comisiones</p>
+            </div>
+            <div>
+              <strong class="display text-2xl font-bold sm:text-3xl text-wine">Directo</strong>
+              <p class="text-[11px] text-[#7c716b] uppercase tracking-wider mt-0.5">A tu WhatsApp</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hero 3D Mockup Stage -->
+        <div class="lg:col-span-5">
+          <div class="hero-3d-stage relative mx-auto w-full max-w-md py-6">
+            <div class="hero-3d-scene relative">
+              <!-- Elevated Main Card Mockup -->
+              <div class="hero-3d-main-card relative rounded-2xl border border-[#e4d7cc] bg-gradient-to-b from-[#fbf8f4] to-[#f4ebe1] p-5 shadow-2xl">
+                <!-- Browser-like header bar -->
+                <div class="flex items-center justify-between border-b border-[#ded3ca] pb-3 text-[10px] text-[#8e8179]">
+                  <div class="flex items-center gap-1.5">
+                    <span class="h-2.5 w-2.5 rounded-full bg-[#e8a69c]"></span>
+                    <span class="h-2.5 w-2.5 rounded-full bg-[#b08b55]"></span>
+                    <span class="h-2.5 w-2.5 rounded-full bg-[#3a8c67]"></span>
+                  </div>
+                  <span class="font-mono text-[9px] uppercase tracking-wider text-[#9d9189]">tu-negocio.gt/catalogo</span>
+                  <span class="inline-flex items-center gap-1 text-[9px] font-bold text-[#3a8c67]">
+                    <span class="h-1.5 w-1.5 rounded-full bg-[#3a8c67]"></span> EN VIVO
+                  </span>
+                </div>
+
+                <!-- Preview Inner Card Content -->
+                <div class="mt-4 overflow-hidden rounded-xl bg-[#211b1a] text-[#f8f3ed]">
+                  <div class="relative aspect-[16/10] overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=700&q=80" alt="Vista previa de catálogo 3D" class="h-full w-full object-cover opacity-90 transition duration-500 hover:scale-105">
+                    <div class="absolute inset-0 bg-gradient-to-t from-[#211b1a] via-transparent to-transparent"></div>
+                    <span class="absolute left-3 top-3 rounded-full bg-[#fbf8f4]/90 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[.14em] text-wine">
+                      Plantilla 3D Premium
+                    </span>
+                  </div>
+                  <div class="p-4">
+                    <div class="flex items-start justify-between gap-2">
+                      <div>
+                        <h4 class="display text-xl font-semibold">Tu Vitrina Digital</h4>
+                        <p class="text-xs text-[#cdbeb6]">Filtros por categorías, carrito dinámico y pedidos listos.</p>
+                      </div>
+                      <span class="rounded-lg bg-[#3a8c67] px-2 py-1 text-xs font-bold text-white">Activo</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Floating 3D Badges -->
+                <div class="hero-badge-1 absolute -right-4 -top-5 flex items-center gap-2.5 rounded-xl border border-[#ded3ca] bg-[#fbf8f4]/95 p-3 shadow-xl backdrop-blur-md">
+                  <div class="flex h-9 w-9 items-center justify-center rounded-full bg-[#3a8c67] text-white">
+                    <i data-lucide="message-circle" class="h-4 w-4"></i>
+                  </div>
+                  <div>
+                    <p class="text-[9px] font-bold uppercase tracking-wider text-wine">Pedido por WhatsApp</p>
+                    <p class="text-xs font-semibold text-ink">¡Cliente listo para pagar!</p>
+                  </div>
+                </div>
+
+                <div class="hero-badge-2 absolute -bottom-6 -left-4 flex items-center gap-2.5 rounded-xl border border-[#ded3ca] bg-[#fbf8f4]/95 p-3 shadow-xl backdrop-blur-md">
+                  <div class="flex h-9 w-9 items-center justify-center rounded-full bg-[#b08b55] text-white">
+                    <i data-lucide="shopping-bag" class="h-4 w-4"></i>
+                  </div>
+                  <div>
+                    <p class="text-[9px] font-bold uppercase tracking-wider text-[#b08b55]">Carrito Inteligente</p>
+                    <p class="text-xs font-semibold text-ink">Total sumado al instante</p>
+                  </div>
+                </div>
+
+                <div class="hero-badge-3 absolute -bottom-4 right-6 flex items-center gap-2 rounded-full border border-[#ded3ca] bg-wine px-3.5 py-1.5 text-white shadow-lg">
+                  <i data-lucide="sparkles" class="h-3 w-3 text-[#e8a69c]"></i>
+                  <span class="text-[10px] font-bold uppercase tracking-wider">Efectos 3D Fluidos</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN POR CATEGORÍAS DE NEGOCIO -->
+    <section id="categorias" class="mx-auto max-w-7xl px-5 py-20 sm:px-8 border-b border-[#ded3ca]">
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <span class="text-[10px] font-bold uppercase tracking-[.32em] text-wine">Especializadas por sector</span>
+        <h2 class="display mt-2 text-4xl font-semibold sm:text-6xl">
+          Plantillas Adaptadas a tu <em class="font-normal text-wine">Tipo de Negocio</em>
+        </h2>
+        <p class="mt-4 text-sm leading-6 text-[#756962] sm:text-base">
+          Elige la plantilla que mejor se ajusta a tu rubro comercial. Cada modelo está diseñado con estética 3D, catálogo visual con carrito de compras y botón directo para cerrar ventas a WhatsApp al <strong>+502 4028-3552</strong>.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Categoría 1: Moda y Ropa -->
+        <article class="category-card-3d">
+          <div class="category-card-inner flex h-full flex-col p-4">
+            <div class="category-card-image-wrapper relative aspect-[16/10] w-full">
+              <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=700&q=80" alt="Plantilla para Moda y Ropa" class="category-card-image h-full w-full object-cover" loading="lazy">
+              <span class="absolute left-3 top-3 rounded-full bg-[#fbf8f4]/95 px-3 py-1 text-[9px] font-bold uppercase tracking-[.14em] text-wine shadow-sm">
+                Moda & Boutiques
+              </span>
+            </div>
+            <div class="card-layer-3d flex flex-1 flex-col justify-between pt-5">
+              <div>
+                <h3 class="display text-2xl font-semibold text-ink">Moda, Ropa & Calzado</h3>
+                <p class="mt-2 text-xs leading-5 text-[#756962]">
+                  Diseñada para boutiques, calzado, accesorios y creadores de moda. Destaca el detalle de telas, texturas y tallas.
+                </p>
+                <ul class="mt-4 space-y-2 text-xs text-[#5e544e]">
+                  <li class="flex items-center gap-2"><i data-lucide="check" class="h-3.5 w-3.5 text-[#3a8c67]"></i> Galería HD con zoom de producto</li>
+                  <li class="flex items-center gap-2"><i data-lucide="check" class="h-3.5 w-3.5 text-[#3a8c67]"></i> Filtros por temporadas y tallas</li>
+                  <li class="flex items-center gap-2"><i data-lucide="check" class="h-3.5 w-3.5 text-[#3a8c67]"></i> Pedidos detallados a WhatsApp</li>
+                </ul>
+              </div>
+              <div class="mt-6 flex items-center gap-2 border-t border-[#eee5dc] pt-4">
+                <a href="https://wa.me/50240283552?text=¡Hola!%20Me%20interesa%20adquirir%20la%20plantilla%20de%20catálogo%20para%20mi%20negocio%20de%20Moda%20y%20Ropa." target="_blank" rel="noopener" class="btn-3d-primary inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#3a8c67] py-2.5 text-[11px] font-bold uppercase tracking-[.1em] text-white">
+                  <i data-lucide="message-circle" class="h-4 w-4"></i> Pedir Plantilla
+                </a>
+                <a href="#catalogo" class="rounded-full border border-[#d8cbc2] px-3.5 py-2.5 text-[11px] font-semibold text-ink transition hover:border-wine hover:text-wine" title="Ver cómo funciona">
+                  Demo
+                </a>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Categoría 2: Restaurantes y Comida -->
+        <article class="category-card-3d">
+          <div class="category-card-inner flex h-full flex-col p-4">
+            <div class="category-card-image-wrapper relative aspect-[16/10] w-full">
+              <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=700&q=80" alt="Plantilla para Restaurantes y Comida" class="category-card-image h-full w-full object-cover" loading="lazy">
+              <span class="absolute left-3 top-3 rounded-full bg-[#fbf8f4]/95 px-3 py-1 text-[9px] font-bold uppercase tracking-[.14em] text-wine shadow-sm">
+                Gastronomía & Delis
+              </span>
+            </div>
+            <div class="card-layer-3d flex flex-1 flex-col justify-between pt-5">
+              <div>
+                <h3 class="display text-2xl font-semibold text-ink">Restaurantes & Gastronomía</h3>
+                <p class="mt-2 text-xs leading-5 text-[#756962]">
+                  Un menú digital interactivo y apetitoso para cafeterías, pastelerías, repostería, food trucks y restaurantes.
+                </p>
+                <ul class="mt-4 space-y-2 text-xs text-[#5e544e]">
+                  <li class="flex items-center gap-2"><i data-lucide="check" class="h-3.5 w-3.5 text-[#3a8c67]"></i> Menú dividido por categorías y platos</li>
+                  <li class="flex items-center gap-2"><i data-lucide="check" class="h-3.5 w-3.5 text-[#3a8c67]"></i> Opciones de combos y extras</li>
+                  <li class="flex items-center gap-2"><i data-lucide="check" class="h-3.5 w-3.5 text-[#3a8c67]"></i> Envío de orden para delivery al instante</li>
+                </ul>
+              </div>
+              <div class="mt-6 flex items-center gap-2 border-t border-[#eee5dc] pt-4">
+                <a href="https://wa.me/50240283552?text=¡Hola!%20Me%20interesa%20adquirir%20la%20plantilla%20de%20catálogo%20para%20mi%20negocio%20de%20Restaurantes%20y%20Comida." target="_blank" rel="noopener" class="btn-3d-primary inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#3a8c67] py-2.5 text-[11px] font-bold uppercase tracking-[.1em] text-white">
+                  <i data-lucide="message-circle" class="h-4 w-4"></i> Pedir Plantilla
+                </a>
+                <a href="#catalogo" class="rounded-full border border-[#d8cbc2] px-3.5 py-2.5 text-[11px] font-semibold text-ink transition hover:border-wine hover:text-wine" title="Ver cómo funciona">
+                  Demo
+                </a>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Categoría 3: Belleza y Cosmética -->
+        <article class="category-card-3d">
+          <div class="category-card-inner flex h-full flex-col p-4">
+            <div class="category-card-image-wrapper relative aspect-[16/10] w-full">
+              <img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=700&q=80" alt="Plantilla para Belleza y Estética" class="category-card-image h-full w-full object-cover" loading="lazy">
+              <span class="absolute left-3 top-3 rounded-full bg-[#fbf8f4]/95 px-3 py-1 text-[9px] font-bold uppercase tracking-[.14em] text-wine shadow-sm">
+                Belleza & Cuidado
+              </span>
+            </div>
+            <div class="card-layer-3d flex flex-1 flex-col justify-between pt-5">
+              <div>
+                <h3 class="display text-2xl font-semibold text-ink">Belleza, Estética & Spa</h3>
+                <p class="mt-2 text-xs leading-5 text-[#756962]">
+                  Estilo limpio, delicado y sofisticado para productos de skincare, cosméticos, maquillaje, salones y spas.
+                </p>
+                <ul class="mt-4 space-y-2 text-xs text-[#5e544e]">
+                  <li class="flex items-center gap-2"><i data-lucide="check" class="h-3.5 w-3.5 text-[#3a8c67]"></i> Presentación refinada y minimalista</li>
+                  <li class="flex items-center gap-2"><i data-lucide="check" class="h-3.5 w-3.5 text-[#3a8c67]"></i> Filtros por beneficios y tipo de piel</li>
+                  <li class="flex items-center gap-2"><i data-lucide="check" class="h-3.5 w-3.5 text-[#3a8c67]"></i> Asesoría y pedidos directos a WhatsApp</li>
+                </ul>
+              </div>
+              <div class="mt-6 flex items-center gap-2 border-t border-[#eee5dc] pt-4">
+                <a href="https://wa.me/50240283552?text=¡Hola!%20Me%20interesa%20adquirir%20la%20plantilla%20de%20catálogo%20para%20mi%20negocio%20de%20Belleza%20y%20Estética." target="_blank" rel="noopener" class="btn-3d-primary inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#3a8c67] py-2.5 text-[11px] font-bold uppercase tracking-[.1em] text-white">
+                  <i data-lucide="message-circle" class="h-4 w-4"></i> Pedir Plantilla
+                </a>
+                <a href="#catalogo" class="rounded-full border border-[#d8cbc2] px-3.5 py-2.5 text-[11px] font-semibold text-ink transition hover:border-wine hover:text-wine" title="Ver cómo funciona">
+                  Demo
+                </a>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Categoría 4: Servicios Locales y Profesionales -->
+        <article class="category-card-3d">
+          <div class="category-card-inner flex h-full flex-col p-4">
+            <div class="category-card-image-wrapper relative aspect-[16/10] w-full">
+              <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=700&q=80" alt="Plantilla para Servicios Locales" class="category-card-image h-full w-full object-cover" loading="lazy">
+              <span class="absolute left-3 top-3 rounded-full bg-[#fbf8f4]/95 px-3 py-1 text-[9px] font-bold uppercase tracking-[.14em] text-wine shadow-sm">
+                Servicios & Asesoría
+              </span>
+            </div>
+            <div class="card-layer-3d flex flex-1 flex-col justify-between pt-5">
+              <div>
+                <h3 class="display text-2xl font-semibold text-ink">Servicios Locales & Empresas</h3>
+                <p class="mt-2 text-xs leading-5 text-[#756962]">
+                  Ideal para talleres, agencias, remodelaciones, consultorías técnicas y profesionales independientes.
+                </p>
+                <ul class="mt-4 space-y-2 text-xs text-[#5e544e]">
+                  <li class="flex items-center gap-2"><i data-lucide="check" class="h-3.5 w-3.5 text-[#3a8c67]"></i> Paquetes de servicios claros con precios</li>
+                  <li class="flex items-center gap-2"><i data-lucide="check" class="h-3.5 w-3.5 text-[#3a8c67]"></i> Generador de cotizaciones ágiles</li>
+                  <li class="flex items-center gap-2"><i data-lucide="check" class="h-3.5 w-3.5 text-[#3a8c67]"></i> Contacto y reserva de citas al WhatsApp</li>
+                </ul>
+              </div>
+              <div class="mt-6 flex items-center gap-2 border-t border-[#eee5dc] pt-4">
+                <a href="https://wa.me/50240283552?text=¡Hola!%20Me%20interesa%20adquirir%20la%20plantilla%20de%20catálogo%20para%20Servicios%20Locales." target="_blank" rel="noopener" class="btn-3d-primary inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#3a8c67] py-2.5 text-[11px] font-bold uppercase tracking-[.1em] text-white">
+                  <i data-lucide="message-circle" class="h-4 w-4"></i> Pedir Plantilla
+                </a>
+                <a href="#catalogo" class="rounded-full border border-[#d8cbc2] px-3.5 py-2.5 text-[11px] font-semibold text-ink transition hover:border-wine hover:text-wine" title="Ver cómo funciona">
+                  Demo
+                </a>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Categoría 5: Artesanías y Cultura -->
+        <article class="category-card-3d">
+          <div class="category-card-inner flex h-full flex-col p-4">
+            <div class="category-card-image-wrapper relative aspect-[16/10] w-full">
+              <img src="https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?auto=format&fit=crop&w=700&q=80" alt="Plantilla para Artesanías" class="category-card-image h-full w-full object-cover" loading="lazy">
+              <span class="absolute left-3 top-3 rounded-full bg-[#fbf8f4]/95 px-3 py-1 text-[9px] font-bold uppercase tracking-[.14em] text-wine shadow-sm">
+                Tradición & Arte
+              </span>
+            </div>
+            <div class="card-layer-3d flex flex-1 flex-col justify-between pt-5">
+              <div>
+                <h3 class="display text-2xl font-semibold text-ink">Artesanías & Cultura Local</h3>
+                <p class="mt-2 text-xs leading-5 text-[#756962]">
+                  Resalta la belleza de los textiles típicos, calzado artesanal en cuero, cerámica y productos hechos a mano en Guatemala.
+                </p>
+                <ul class="mt-4 space-y-2 text-xs text-[#5e544e]">
+                  <li class="flex items-center gap-2"><i data-lucide="check" class="h-3.5 w-3.5 text-[#3a8c67]"></i> Espacio para contar la historia del artesano</li>
+                  <li class="flex items-center gap-2"><i data-lucide="check" class="h-3.5 w-3.5 text-[#3a8c67]"></i> Exhibición de piezas únicas y exclusivas</li>
+                  <li class="flex items-center gap-2"><i data-lucide="check" class="h-3.5 w-3.5 text-[#3a8c67]"></i> Coordinación de envíos por WhatsApp</li>
+                </ul>
+              </div>
+              <div class="mt-6 flex items-center gap-2 border-t border-[#eee5dc] pt-4">
+                <a href="https://wa.me/50240283552?text=¡Hola!%20Me%20interesa%20adquirir%20la%20plantilla%20de%20catálogo%20para%20Artesanías%20y%20Cultura." target="_blank" rel="noopener" class="btn-3d-primary inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#3a8c67] py-2.5 text-[11px] font-bold uppercase tracking-[.1em] text-white">
+                  <i data-lucide="message-circle" class="h-4 w-4"></i> Pedir Plantilla
+                </a>
+                <a href="#catalogo" class="rounded-full border border-[#d8cbc2] px-3.5 py-2.5 text-[11px] font-semibold text-ink transition hover:border-wine hover:text-wine" title="Ver cómo funciona">
+                  Demo
+                </a>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Categoría 6: Tecnología y Gadgets -->
+        <article class="category-card-3d">
+          <div class="category-card-inner flex h-full flex-col p-4">
+            <div class="category-card-image-wrapper relative aspect-[16/10] w-full">
+              <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=700&q=80" alt="Plantilla para Tecnología y Accesorios" class="category-card-image h-full w-full object-cover" loading="lazy">
+              <span class="absolute left-3 top-3 rounded-full bg-[#fbf8f4]/95 px-3 py-1 text-[9px] font-bold uppercase tracking-[.14em] text-wine shadow-sm">
+                Tecnología & Gadgets
+              </span>
+            </div>
+            <div class="card-layer-3d flex flex-1 flex-col justify-between pt-5">
+              <div>
+                <h3 class="display text-2xl font-semibold text-ink">Tecnología & Novedades</h3>
+                <p class="mt-2 text-xs leading-5 text-[#756962]">
+                  Perfecta para tiendas de tecnología, accesorios para celulares, periféricos de computadora y novedades.
+                </p>
+                <ul class="mt-4 space-y-2 text-xs text-[#5e544e]">
+                  <li class="flex items-center gap-2"><i data-lucide="check" class="h-3.5 w-3.5 text-[#3a8c67]"></i> Especificaciones técnicas y compatibilidad</li>
+                  <li class="flex items-center gap-2"><i data-lucide="check" class="h-3.5 w-3.5 text-[#3a8c67]"></i> Indicadores de stock y promociones</li>
+                  <li class="flex items-center gap-2"><i data-lucide="check" class="h-3.5 w-3.5 text-[#3a8c67]"></i> Cierre rápido de compra sin fricción</li>
+                </ul>
+              </div>
+              <div class="mt-6 flex items-center gap-2 border-t border-[#eee5dc] pt-4">
+                <a href="https://wa.me/50240283552?text=¡Hola!%20Me%20interesa%20adquirir%20la%20plantilla%20de%20catálogo%20para%20Tecnología%20y%20Accesorios." target="_blank" rel="noopener" class="btn-3d-primary inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#3a8c67] py-2.5 text-[11px] font-bold uppercase tracking-[.1em] text-white">
+                  <i data-lucide="message-circle" class="h-4 w-4"></i> Pedir Plantilla
+                </a>
+                <a href="#catalogo" class="rounded-full border border-[#d8cbc2] px-3.5 py-2.5 text-[11px] font-semibold text-ink transition hover:border-wine hover:text-wine" title="Ver cómo funciona">
+                  Demo
+                </a>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- SECCIÓN DE BENEFICIOS 3D -->
+    <section id="beneficios" class="border-b border-[#ded3ca] bg-[#eee2d8] py-20 sm:py-24">
+      <div class="mx-auto max-w-7xl px-5 sm:px-8">
+        <div class="text-center max-w-3xl mx-auto mb-16">
+          <span class="text-[10px] font-bold uppercase tracking-[.32em] text-wine">¿Por qué nuestras plantillas?</span>
+          <h2 class="display mt-2 text-4xl font-semibold sm:text-6xl">
+            Ventajas que hacen <em class="font-normal text-wine">crecer tus ventas</em>
+          </h2>
+          <p class="mt-4 text-sm leading-6 text-[#655952] sm:text-base">
+            Diseñadas pensando en los negocios de hoy: máxima atracción visual, facilidad de compra y cierre directo sin intermediarios.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="benefit-card rounded-2xl border border-[#ded3ca] bg-[#fbf8f4] p-6 shadow-sm">
+            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-wine text-white mb-5 shadow-md">
+              <i data-lucide="percent" class="h-6 w-6"></i>
+            </div>
+            <h3 class="display text-2xl font-semibold text-ink">0% Comisiones</h3>
+            <p class="mt-2 text-xs leading-5 text-[#756962]">
+              No pagues tarifas por cada producto vendido ni mensualidades caras. La plantilla es tuya y tus ganancias quedan íntegras en tu bolsillo.
+            </p>
+          </div>
+
+          <div class="benefit-card rounded-2xl border border-[#ded3ca] bg-[#fbf8f4] p-6 shadow-sm">
+            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-[#3a8c67] text-white mb-5 shadow-md">
+              <i data-lucide="message-square" class="h-6 w-6"></i>
+            </div>
+            <h3 class="display text-2xl font-semibold text-ink">Venta por WhatsApp</h3>
+            <p class="mt-2 text-xs leading-5 text-[#756962]">
+              Tus clientes llenan el carrito y te llega el pedido organizado con códigos, nombres, cantidades y monto total listo para enviar.
+            </p>
+          </div>
+
+          <div class="benefit-card rounded-2xl border border-[#ded3ca] bg-[#fbf8f4] p-6 shadow-sm">
+            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-[#b08b55] text-white mb-5 shadow-md">
+              <i data-lucide="smartphone" class="h-6 w-6"></i>
+            </div>
+            <h3 class="display text-2xl font-semibold text-ink">100% Móvil & Rápido</h3>
+            <p class="mt-2 text-xs leading-5 text-[#756962]">
+              Optimizado para celulares con carga ultra veloz. Tus clientes navegarán y comprarán con la máxima fluidez y comodidad.
+            </p>
+          </div>
+
+          <div class="benefit-card rounded-2xl border border-[#ded3ca] bg-[#fbf8f4] p-6 shadow-sm">
+            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-[#282522] text-white mb-5 shadow-md">
+              <i data-lucide="layers" class="h-6 w-6"></i>
+            </div>
+            <h3 class="display text-2xl font-semibold text-ink">Efectos 3D Fluidos</h3>
+            <p class="mt-2 text-xs leading-5 text-[#756962]">
+              Destaca de la competencia tradicional con tarjetas tridimensionales, música ambiental de fondo y una experiencia premium.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DEMOSTRACIÓN DEL CATÁLOGO EN VIVO -->
+    <section id="catalogo" class="mx-auto max-w-7xl px-5 py-20 sm:px-8 border-b border-[#ded3ca]">
+      <div class="mb-10 text-center max-w-2xl mx-auto">
+        <span class="text-[10px] font-bold uppercase tracking-[.32em] text-wine">Demostración en Vivo</span>
+        <h2 class="display mt-2 text-4xl font-semibold sm:text-6xl">
+          Prueba el Catálogo <em class="font-normal text-wine">en Acción</em>
+        </h2>
+        <p class="mt-3 text-sm text-[#756962]">
+          Así explorarán tus clientes tus productos: filtra por marcas, usa el buscador en vivo, agrega al carrito y comprueba cómo se genera el pedido hacia WhatsApp.
+        </p>
+      </div>
+
+      <div class="mb-8 flex flex-col gap-5 border-y border-[#ded3ca] py-5 lg:flex-row lg:items-center lg:justify-between">
+        <div class="flex gap-2 overflow-x-auto pb-1" id="brandFilters">
+          <button class="filter-button active whitespace-nowrap rounded-full border border-[#d8cbc2] px-4 py-2 text-[11px] font-semibold uppercase tracking-[.12em] transition" data-brand="Todas">Todas</button>
+          <button class="filter-button whitespace-nowrap rounded-full border border-[#d8cbc2] px-4 py-2 text-[11px] font-semibold uppercase tracking-[.12em] transition hover:border-wine" data-brand="Café y bebidas">Café y bebidas</button>
+          <button class="filter-button whitespace-nowrap rounded-full border border-[#d8cbc2] px-4 py-2 text-[11px] font-semibold uppercase tracking-[.12em] transition hover:border-wine" data-brand="Textiles típicos">Textiles típicos</button>
+          <button class="filter-button whitespace-nowrap rounded-full border border-[#d8cbc2] px-4 py-2 text-[11px] font-semibold uppercase tracking-[.12em] transition hover:border-wine" data-brand="Sabores artesanales">Sabores artesanales</button>
+          <button class="filter-button whitespace-nowrap rounded-full border border-[#d8cbc2] px-4 py-2 text-[11px] font-semibold uppercase tracking-[.12em] transition hover:border-wine" data-brand="Artesanías">Artesanías</button>
+        </div>
+        <label class="relative block min-w-0 lg:w-64">
+          <i data-lucide="search" class="absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8e8179]"></i>
+          <input id="searchInput" type="search" placeholder="Buscar producto o código" class="w-full border-b border-[#bfb1a7] bg-transparent py-2 pl-7 pr-1 text-sm outline-none placeholder:text-[#9d9189] focus:border-wine">
+        </label>
+      </div>
+      <div id="productGrid"></div>
+      <div id="emptyState" class="hidden py-20 text-center">
+        <i data-lucide="search-x" class="mx-auto mb-4 h-8 w-8 text-[#aa9c93]"></i>
+        <p class="display text-3xl">No encontramos ese producto.</p>
+        <p class="mt-2 text-sm text-[#756962]">Prueba con otro nombre, categoría o código.</p>
+      </div>
+    </section>
+
+    <!-- BANNER DE CIERRE Y CONTACTO WHATSAPP -->
+    <section class="mx-auto max-w-7xl px-5 py-16 sm:px-8">
+      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#723c48] via-[#5a2e38] to-[#282522] p-8 text-white shadow-2xl sm:p-14">
+        <div class="relative z-10 max-w-2xl">
+          <span class="rounded-full bg-white/20 px-3.5 py-1 text-[10px] font-bold uppercase tracking-[.2em] text-[#e8a69c]">¡Comienza hoy mismo!</span>
+          <h2 class="display mt-4 text-4xl font-semibold sm:text-6xl">
+            ¿Listo para llevar tu negocio a WhatsApp con estilo?
+          </h2>
+          <p class="mt-4 text-sm leading-6 text-[#ded3ca] sm:text-base">
+            Adquiere tu plantilla personalizada para tu negocio en Guatemala. Escríbenos directamente y te asesoramos para dejarla lista con tus fotos, productos y precios.
+          </p>
+          <div class="mt-8 flex flex-wrap items-center gap-4">
+            <a data-wa-link="closing" href="#" target="_blank" rel="noopener" class="btn-3d-primary inline-flex items-center gap-2 rounded-full bg-[#3a8c67] px-7 py-4 text-xs font-bold uppercase tracking-[.14em] text-white">
+              <i data-lucide="message-circle" class="h-5 w-5"></i> Contactar al +502 4028-3552
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="mx-auto flex max-w-7xl flex-col items-center gap-5 px-5 py-8 text-[10px] uppercase tracking-[.2em] text-[#8e8179] sm:flex-row sm:justify-between sm:px-8">
+    <span data-business-name>Catálogo Guatemala</span>
+    <div class="social-row">
+      <a data-social="facebook" href="#" target="_blank" rel="noopener" class="icon-btn" aria-label="Síguenos en Facebook">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M14 8.5h-1.5A2 2 0 0 0 10.5 10.5V13H9v3h1.5v5H14v-5h2l.5-3h-2.5v-2c0-.28.22-.5.5-.5H14z"/></svg>
+      </a>
+      <a data-social="instagram" href="#" target="_blank" rel="noopener" class="icon-btn" aria-label="Síguenos en Instagram">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17" cy="7" r="0.6" fill="currentColor" stroke="none"/></svg>
+      </a>
+      <a data-social="tiktok" href="#" target="_blank" rel="noopener" class="icon-btn" aria-label="Síguenos en TikTok">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4v9.6a3.4 3.4 0 1 1-2.6-3.3"/><path d="M14 4c.5 2.2 2.1 3.7 4.3 4"/></svg>
+      </a>
+    </div>
+    <span class="flex items-center gap-2 font-semibold text-[#3a8c67]">
+      <i data-lucide="message-circle" class="h-3.5 w-3.5"></i> WhatsApp: +502 4028-3552
+    </span>
+    <span>Tu historia, tus productos, tu negocio.</span>
+  </footer>
+
+  <div id="overlay" class="overlay fixed inset-0 z-40 bg-[#282522]/35"></div>
+  <aside id="cartDrawer" class="drawer fixed right-0 top-0 z-50 flex h-full w-full max-w-md flex-col bg-[#fbf8f4] shadow-2xl" aria-label="Carrito de compras">
+    <div class="flex items-center justify-between border-b border-[#ded3ca] px-6 py-5">
+      <div>
+        <p class="text-[10px] uppercase tracking-[.22em] text-wine">Tu selección</p>
+        <h2 class="display text-4xl font-semibold">Carrito</h2>
+      </div>
+      <button id="closeCart" class="flex h-10 w-10 items-center justify-center rounded-full border border-[#d8cbc2] transition hover:border-wine hover:text-wine" aria-label="Cerrar carrito">
+        <i data-lucide="x" class="h-5 w-5"></i>
+      </button>
+    </div>
+    <div id="cartItems" class="flex-1 overflow-y-auto px-6 py-4"></div>
+    <div class="border-t border-[#ded3ca] px-6 py-5">
+      <div class="mb-4 flex items-center justify-between text-sm">
+        <span class="text-[#756962]">Total estimado</span>
+        <strong id="cartTotal" class="text-lg">$0.00</strong>
+      </div>
+      <a id="whatsappButton" href="https://wa.me/50240283552" target="_blank" rel="noopener" class="flex w-full items-center justify-center gap-2 bg-[#3a8c67] px-5 py-3.5 text-[11px] font-bold uppercase tracking-[.16em] text-white transition hover:bg-[#2f7455]">
+        <i data-lucide="message-circle" class="h-4 w-4"></i> Pedir por WhatsApp
+      </a>
+      <p class="mt-3 text-center text-[10px] leading-4 text-[#9a8e86]">El pedido se confirmará directamente contigo por WhatsApp al +502 4028-3552.</p>
+    </div>
+  </aside>
+
+  <div id="toast" class="toast fixed bottom-7 left-1/2 z-[70] flex items-center gap-2 bg-[#282522] px-5 py-3 text-xs text-white shadow-xl">
+    <i data-lucide="check" class="h-4 w-4 text-[#e8a69c]"></i><span>Producto añadido a tu selección</span>
+  </div>
+
+  <audio id="backgroundMusic" src="musica.mp3" loop preload="auto" playsinline>
+    Tu navegador no admite audio HTML5.
+  </audio>
+
+  <a data-wa-link="floating" href="#" target="_blank" rel="noopener" class="wa-floating-btn fixed bottom-5 right-5 z-30 inline-flex items-center gap-2 rounded-full bg-[#3a8c67] px-4 py-3 text-xs font-bold text-white shadow-xl transition hover:bg-[#2f7455]" aria-label="Adquiere esta plantilla por WhatsApp">
+    <i data-lucide="message-circle" class="h-4 w-4"></i> Adquiere esta plantilla
+  </a>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script type="module" src="script.js"></script>
+</body>
+</html>
