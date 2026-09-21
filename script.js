@@ -51,7 +51,7 @@ function buildTagRain() {
 // MÚSICA DE FONDO (rotación de 3 canciones)
 // ------------------------------------------------------------
 const bgMusic = document.getElementById('bgMusic');
-const canciones = ['cancion1.mp3', 'cancion2.mp3', 'cancion3.mp3'];
+const canciones = ['musica/cancion1.mp3', 'musica/cancion2.mp3', 'musica/cancion3.mp3'];
 let playlist = [...canciones].sort(() => Math.random() - 0.5);
 let trackIndex = 0;
 bgMusic.src = playlist[trackIndex];
