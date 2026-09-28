@@ -56,7 +56,7 @@ body.no-scroll { overflow: hidden !important; touch-action: none; overscroll-beh
 .intro__eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .25em; text-transform: uppercase; color: #7c6cff; }
 .intro__wordmark {
   font-family: 'Space Grotesk', sans-serif; font-weight: 700; letter-spacing: -.02em;
-  font-size: clamp(2.6rem, 8vw, 5.5rem); line-height: 1; color: #f5f6fb;
+  font-size: clamp(1.8rem, 6.5vw, 4.5rem); line-height: 1; color: #f5f6fb; white-space: nowrap;
 }
 .intro__wordmark .letter { display: inline-block; animation: letterWave 4s ease-in-out infinite; }
 @keyframes letterWave { 0%,78%,100%{transform:translateY(0)} 84%{transform:translateY(-8px)} 90%{transform:translateY(1px)} }
@@ -204,17 +204,20 @@ body.no-scroll { overflow: hidden !important; touch-action: none; overscroll-beh
   border: 1px solid rgba(255,255,255,.15);
 }
 .modal-nav--prev { left: 10px; } .modal-nav--next { right: 10px; }
-.modal-info { flex: 1 1 auto; display: flex; flex-direction: column; padding: 1.75rem; overflow: hidden; }
-.modal-info__scroll { overflow-y: auto; }
+.modal-info { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; padding: 1.75rem; overflow: hidden; }
+.modal-info__scroll { flex: 1 1 auto; min-height: 0; max-height: 100%; overflow-y: auto; overflow-wrap: anywhere; }
 .modal-tag { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: #2dd4e0; }
 .modal-title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.8rem; margin-top: .35rem; }
 .modal-price { margin-top: .5rem; font-size: 1.4rem; font-weight: 700; color: #f5f6fb; }
+.modal-note { margin-top: .75rem; padding: .75rem 1rem; border: 1px solid rgba(45,212,224,.28); border-left: 3px solid #2dd4e0; border-radius: 8px; background: rgba(45,212,224,.07); color: #cfd2ea; font-size: .8rem; line-height: 1.5; }
 .modal-resumen { margin-top: .75rem; color: #b7bad0; font-size: .9rem; line-height: 1.5; }
-.modal-features { margin-top: 1.1rem; display: flex; flex-direction: column; gap: .55rem; }
+.modal-features { margin-top: 1.1rem; display: flex; flex-direction: column; gap: .75rem; }
 .modal-features li { display: flex; align-items: flex-start; gap: .5rem; font-size: .85rem; color: #cfd2ea; }
 .modal-features li::before { content: '✓'; color: #2dd4e0; font-weight: 700; }
+.modal-features li.feature-extra { color: #2dd4e0; }
+.modal-features li.feature-extra::before { color: #2dd4e0; }
 .modal-cta {
-  margin-top: 1.25rem; width: 100%; padding: 1rem; border-radius: 14px; font-weight: 700; text-transform: uppercase;
+  flex: 0 0 auto; margin-top: 1.25rem; width: 100%; padding: 1rem; border-radius: 14px; font-weight: 700; text-transform: uppercase;
   font-size: 12px; letter-spacing: .1em; color: #06070d; background: linear-gradient(120deg,#2dd4e0,#7c6cff);
   display: flex; align-items: center; justify-content: center; gap: .5rem;
   transition: transform .2s ease;

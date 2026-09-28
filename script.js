@@ -8,7 +8,7 @@ let currentFilter = 'Planes';
 let searchQuery = '';
 let currentModalIndex = 0;
 let hasEntered = false;
-let cotizacion = JSON.parse(localStorage.getItem('nexo-cotizacion') || '[]');
+let cotizacion = JSON.parse(localStorage.getItem('val-store-cotizacion') || '[]');
 
 const WHATSAPP_PHONE = config.whatsappNumber;
 const waLink = (message) => `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`;
@@ -54,6 +54,7 @@ const bgMusic = document.getElementById('bgMusic');
 const canciones = ['musica/cancion1.mp3', 'musica/cancion2.mp3', 'musica/cancion3.mp3'];
 let playlist = [...canciones].sort(() => Math.random() - 0.5);
 let trackIndex = 0;
+let wasPlayingBeforeHide = false;
 bgMusic.src = playlist[trackIndex];
 
 function playNextTrack() {
@@ -77,12 +78,32 @@ function updateMusicButton(isPlaying) {
 
 document.getElementById('musicToggle').addEventListener('click', () => {
   if (!hasEntered) return;
+  wasPlayingBeforeHide = false;
   if (bgMusic.paused) { bgMusic.play().then(() => updateMusicButton(true)).catch(() => updateMusicButton(false)); }
   else { bgMusic.pause(); updateMusicButton(false); }
 });
+
+function pauseMusicForDeparture() {
+  if (!bgMusic.paused) {
+    wasPlayingBeforeHide = true;
+    bgMusic.pause();
+    updateMusicButton(false);
+  }
+}
+
+function resumeMusicAfterReturn() {
+  if (document.hidden || !wasPlayingBeforeHide) return;
+  wasPlayingBeforeHide = false;
+  bgMusic.play().then(() => updateMusicButton(true)).catch(() => updateMusicButton(false));
+}
+
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden && !bgMusic.paused) { bgMusic.pause(); updateMusicButton(false); }
+  if (document.hidden) pauseMusicForDeparture();
+  else resumeMusicAfterReturn();
 });
+window.addEventListener('pagehide', pauseMusicForDeparture);
+window.addEventListener('blur', pauseMusicForDeparture);
+window.addEventListener('focus', resumeMusicAfterReturn);
 
 // ------------------------------------------------------------
 // INTRO 3D (three.js) — recolorado a violeta / cian
@@ -229,7 +250,7 @@ function renderGaleria() {
       <div class="product-card__body">
         <h3>${item.titulo}</h3>
         <p>${item.resumen}</p>
-        <p class="product-card__price">${item.precio}</p>
+        <p class="product-card__price">${item.cat === 'Planes' ? item.precio : item.precio}</p>
       </div>
     </article>`).join('');
   empty.classList.toggle('hidden', list.length > 0);
@@ -264,9 +285,20 @@ function renderModal() {
   document.getElementById('mImg').src = item.img;
   document.getElementById('mCat').textContent = item.cat;
   document.getElementById('mTitulo').textContent = item.titulo;
-  document.getElementById('mPrecio').textContent = item.precio;
-  document.getElementById('mResumen').textContent = item.resumen;
-  document.getElementById('mFeatures').innerHTML = item.features.map(f => `<li>${f}</li>`).join('');
+  const esPlan = item.cat === 'Planes';
+  const precio = document.getElementById('mPrecio');
+  precio.textContent = esPlan ? item.precio : '';
+  precio.classList.toggle('hidden', !esPlan);
+  const resumen = document.getElementById('mResumen');
+  resumen.textContent = item.resumen;
+  resumen.classList.toggle('hidden', item.cat === 'Planes');
+  const notaPrecio = document.getElementById('mNotaPrecio');
+  notaPrecio.textContent = esPlan ? item.notaPrecio : '';
+  notaPrecio.classList.toggle('hidden', !esPlan);
+  document.getElementById('mFeatures').innerHTML = item.features.map(f => {
+    const esCostoExtra = f.startsWith('Cualquier actualización que pase de las');
+    return `<li${esCostoExtra ? ' class="feature-extra"' : ''}>${f}</li>`;
+  }).join('');
   const btn = document.getElementById('btnAgregar');
   const yaAgregado = cotizacion.some(entry => entry.id === item.id);
   btn.disabled = yaAgregado;
@@ -282,11 +314,14 @@ document.getElementById('modalNext').addEventListener('click', () => stepModal(1
 // ------------------------------------------------------------
 // COTIZACIÓN (carrito de interés)
 // ------------------------------------------------------------
-function saveCotizacion() { localStorage.setItem('nexo-cotizacion', JSON.stringify(cotizacion)); }
+function saveCotizacion() { localStorage.setItem('val-store-cotizacion', JSON.stringify(cotizacion)); }
 
 function addToCotizacion() {
   const item = catalogos[currentModalIndex];
   if (cotizacion.some(entry => entry.id === item.id)) return;
+  if (item.cat === 'Planes') {
+    cotizacion = cotizacion.filter(entry => entry.cat !== 'Planes');
+  }
   cotizacion.push(item);
   saveCotizacion();
   renderCotizacion();
@@ -304,12 +339,14 @@ function removeFromCotizacion(id) {
 function renderCotizacion() {
   const container = document.getElementById('cartItems');
   const badge = document.getElementById('cartBadge');
-  const totalEl = document.getElementById('cartTotal');
+  const pagoInicialEl = document.getElementById('cartPagoInicial');
+  const mensualidadEl = document.getElementById('cartMensualidad');
 
   if (cotizacion.length === 0) {
     container.innerHTML = '<p class="cart-empty">Aún no agregas nada. Explora los planes y el portafolio para armar tu cotización.</p>';
     badge.classList.add('hidden');
-    totalEl.textContent = 'Q0';
+    pagoInicialEl.textContent = 'Q0';
+    mensualidadEl.textContent = 'Q0';
     document.getElementById('whatsappButton').href = waLink('¡Hola! Quiero platicar sobre un catálogo web para mi negocio.');
     return;
   }
@@ -317,28 +354,35 @@ function renderCotizacion() {
   badge.textContent = cotizacion.length;
   badge.classList.remove('hidden');
 
-  let total = 0;
+  let pagoInicial = 0;
+  let mensualidad = 0;
   container.innerHTML = cotizacion.map(item => {
-    total += Number(item.precio.replace(/[^0-9]/g, '')) || 0;
+    pagoInicial += Number(item.pagoInicial) || 0;
+    mensualidad += Number(item.mensualidad) || 0;
+    const precio = item.cat === 'Planes' ? `Q${item.pagoInicial} único + Q${item.mensualidad}/mes` : '';
     return `
       <div class="cart-item">
         <img src="${item.img}" alt="${item.titulo}">
         <div class="cart-item__info">
           <p class="tag">${item.cat}</p>
           <h4>${item.titulo}</h4>
-          <p class="price">${item.precio}</p>
+          ${precio ? `<p class="price">${precio}</p>` : ''}
           <button class="cart-item__remove" data-id="${item.id}">Quitar</button>
         </div>
       </div>`;
   }).join('');
-  totalEl.textContent = `Q${total}`;
+  pagoInicialEl.textContent = `Q${pagoInicial}`;
+  mensualidadEl.textContent = `Q${mensualidad}`;
 
   container.querySelectorAll('.cart-item__remove').forEach(btn => {
     btn.addEventListener('click', () => removeFromCotizacion(btn.dataset.id));
   });
 
-  const lines = cotizacion.map((item, i) => `${i + 1}. ${item.titulo} (${item.cat}) — ${item.precio}`).join('\n');
-  const message = `¡Hola! Quiero cotizar mi catálogo web. Esto es lo que me interesa:\n\n${lines}\n\nTotal estimado: Q${total}\n¿Platicamos los detalles?`;
+  const lines = cotizacion.map((item, i) => {
+    const precio = item.cat === 'Planes' ? ` — Q${item.pagoInicial} único + Q${item.mensualidad}/mes` : '';
+    return `${i + 1}. ${item.titulo} (${item.cat})${precio}`;
+  }).join('\n');
+  const message = `¡Hola! Quiero cotizar mi catálogo web con Val_Store. Esto es lo que me interesa:\n\n${lines}\n\nPago inicial único: Q${pagoInicial}\nMensualidad de mantenimiento: Q${mensualidad}\n¿Platicamos los detalles?`;
   document.getElementById('whatsappButton').href = waLink(message);
 }
 

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Catálogos web premium, interactivos y a tu medida para negocios en Guatemala.">
-<title>NEXO Catálogos | Vitrinas digitales a tu medida</title>
+<title>Val_Store Catálogos | Vitrinas digitales a tu medida</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
   tailwind.config = {
@@ -40,8 +40,8 @@
 
       <div class="intro__panel">
         <div class="intro__eyebrow">Estudio de catálogos web</div>
-        <h1 class="intro__wordmark" aria-label="NEXO Catálogos">
-          <span class="bracket">&lt;</span><span class="letter" style="animation-delay:.02s">N</span><span class="letter" style="animation-delay:.08s">E</span><span class="letter" style="animation-delay:.14s">X</span><span class="letter" style="animation-delay:.2s">O</span><span class="bracket">/&gt;</span>
+        <h1 class="intro__wordmark" aria-label="Val_Store Catálogos">
+          <span class="bracket">&lt;</span><span class="letter" style="animation-delay:.02s">V</span><span class="letter" style="animation-delay:.08s">a</span><span class="letter" style="animation-delay:.14s">l</span><span class="letter" style="animation-delay:.2s">_</span><span class="letter" style="animation-delay:.26s">S</span><span class="letter" style="animation-delay:.32s">t</span><span class="letter" style="animation-delay:.38s">o</span><span class="letter" style="animation-delay:.44s">r</span><span class="letter" style="animation-delay:.5s">e</span><span class="bracket">/&gt;</span>
         </h1>
         <p class="intro__tagline">Convierto tu lista de productos en una vitrina digital interactiva: con estilo 3D, música y pedidos directos a tu WhatsApp.</p>
         <button id="exploreButton" type="button" class="intro__button">
@@ -62,7 +62,7 @@
   <header id="mainNav" class="main-nav">
     <div class="main-nav__row">
       <a href="#top" class="brand">
-        <span class="bracket">&lt;</span>NEXO<span class="bracket">/&gt;</span>
+        <span class="bracket">&lt;</span>Val_Store<span class="bracket">/&gt;</span>
       </a>
 
       <label class="search-box">
@@ -95,6 +95,7 @@
       <p class="section-eyebrow">Lo que ofrezco</p>
       <h2 class="section-title">Elige un plan o explora el portafolio por rubro</h2>
       <p class="section-sub">Cada tarjeta es un ejemplo real de lo que puedo construir para tu negocio. Ábrela para ver el detalle y agrégala a tu cotización.</p>
+      <p class="section-sub">Pago inicial único por la creación del catálogo. Luego solo se cobra una mensualidad por mantenimiento y actualización de tu catálogo.</p>
     </section>
 
     <section class="max-w-7xl mx-auto px-5 sm:px-8 pb-24">
@@ -120,13 +121,13 @@
           </div>
           <div class="benefit-card">
             <i data-lucide="rocket" class="h-6 w-6 text-cyan"></i>
-            <h3>Entrega rápida</h3>
-            <p>Desde 3 días hábiles según el plan que elijas, con acompañamiento incluido.</p>
+            <h3>Personalizado a tu gusto</h3>
+            <p>Diseño el catálogo según tus colores, fotos y estilo. La entrega tarda 20 días.</p>
           </div>
           <div class="benefit-card">
             <i data-lucide="percent" class="h-6 w-6 text-violet"></i>
-            <h3>0% comisiones</h3>
-            <p>El catálogo es tuyo. No pagas por venta ni mensualidades escondidas.</p>
+            <h3>Tu propio dominio</h3>
+            <p>Tu catálogo tiene una dirección web propia. Un dominio es la dirección de tu negocio en internet, como www.tunegocio.com. Tus clientes lo escriben o lo guardan fácil, en lugar de usar un enlace largo.</p>
           </div>
         </div>
       </div>
@@ -148,7 +149,7 @@
   </main>
 
   <footer class="footer">
-    <span class="brand text-sm"><span class="bracket">&lt;</span>NEXO<span class="bracket">/&gt;</span> Catálogos © 2026</span>
+    <span class="brand text-sm"><span class="bracket">&lt;</span>Val_Store<span class="bracket">/&gt;</span> Catálogos © 2026</span>
     <div class="social-row">
       <a data-social="instagram" href="#" target="_blank" rel="noopener" class="icon-btn" aria-label="Instagram">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17" cy="7" r="0.6" fill="currentColor" stroke="none"/></svg>
@@ -177,6 +178,7 @@
           <span id="mCat" class="modal-tag"></span>
           <h2 id="mTitulo" class="modal-title"></h2>
           <p id="mPrecio" class="modal-price"></p>
+          <p id="mNotaPrecio" class="modal-note hidden"></p>
           <p id="mResumen" class="modal-resumen"></p>
           <ul id="mFeatures" class="modal-features"></ul>
         </div>
@@ -204,9 +206,13 @@
     </div>
     <div id="cartItems" class="cart-sidebar__items"></div>
     <div class="cart-sidebar__footer">
+      <div class="flex items-center justify-between text-sm mb-2">
+        <span class="text-muted">Pago inicial único</span>
+        <strong id="cartPagoInicial">Q0</strong>
+      </div>
       <div class="flex items-center justify-between text-sm mb-4">
-        <span class="text-muted">Total estimado (planes)</span>
-        <strong id="cartTotal">Q0</strong>
+        <span class="text-muted">Mensualidad de mantenimiento</span>
+        <strong id="cartMensualidad">Q0</strong>
       </div>
       <a id="whatsappButton" href="#" target="_blank" rel="noopener" class="cta-button w-full justify-center">
         <i data-lucide="message-circle" class="h-4 w-4"></i> Enviar cotización por WhatsApp

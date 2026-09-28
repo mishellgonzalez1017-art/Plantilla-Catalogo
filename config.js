@@ -2,7 +2,7 @@
 // CONFIGURACIÓN — el único archivo que hay que tocar por cliente
 // ============================================================
 export const config = {
-  businessName: 'NEXO Catálogos',
+  businessName: 'Val_Store Catálogos',
   whatsappNumber: '50240283552',
   whatsappMessages: {
     nav: '¡Hola! Vi el catálogo de ejemplo y quiero información sobre mi propio catálogo web.',
